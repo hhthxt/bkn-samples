@@ -1,0 +1,7 @@
+**/.pytest_cache/
+**/__pycache__/
+**/*.pyc
+**/config.yaml
+**/smoke_report.json
+.venv/
+.DS_Store
