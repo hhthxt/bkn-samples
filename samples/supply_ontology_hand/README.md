@@ -1,59 +1,52 @@
-# 供应链本体 · 手工体验包
+# Supply Chain Ontology · Hand Experience Pack
+
+[中文版 (Chinese)](./README_cn.md)
 
 - **Sample slug:** `supply_ontology_hand`
 - **KN ID:** `supply_ontology_hand`
-- **名称:** 供应链本体知识网络-手工版
-- **数据:** 12 张 CSV（脱敏样例，约 16MB）
-- **对象类:** 11 个绑定 + 1 个跳过（`mon_task`，`bind:false`）
+- **Display name:** 供应链本体知识网络-手工版
+- **Data:** 12 CSV files (anonymized, ~16MB)
+- **Object types:** 11 bound + 1 skipped (`mon_task`, `bind:false`)
 
 ## Documentation
 
-- **English:** [docs/openbkn-hand-import-guide.md](docs/openbkn-hand-import-guide.md)
-- **中文:** [docs/openbkn-hand-import-guide_cn.md](docs/openbkn-hand-import-guide_cn.md)
+| Language | Import guide | Scenario design |
+|----------|--------------|-----------------|
+| English | [openbkn-hand-import-guide.md](docs/openbkn-hand-import-guide.md) | [agent-scenario-kn-capability-design.md](docs/agent-scenario-kn-capability-design.md) |
+| 中文 | [openbkn-hand-import-guide_cn.md](docs/openbkn-hand-import-guide_cn.md) | [agent-scenario-kn-capability-design_cn.md](docs/agent-scenario-kn-capability-design_cn.md) |
 
-## 快速开始
+## Quick start
 
-1. 复制 `tools/config.example.yaml` → `tools/config.yaml`，填写数据库与 OpenBKN 环境信息
-2. 按 [OpenBKN 手工体验导入说明书（中文）](docs/openbkn-hand-import-guide_cn.md) 或 [English guide](docs/openbkn-hand-import-guide.md) 步骤 1～7 执行
-3. 冒烟验收：
+1. Copy `tools/config.example.yaml` → `tools/config.yaml` and fill in database / OpenBKN settings
+2. Follow [openbkn-hand-import-guide.md](docs/openbkn-hand-import-guide.md) steps 1–7 ([中文](docs/openbkn-hand-import-guide_cn.md))
+3. Smoke test:
 
 ```bash
 cd tools
 python3 smoke_test.py --config config.yaml
 ```
 
-## 工具一览
+## Tools
 
-| 脚本 | 步骤 | 说明 |
-|------|------|------|
-| `import_kn.py` | 2 | 导入 `kn/supply_ontology_hand.json` |
-| `load_sample_data.py` | 3 | 将 `data/*.csv` 灌入自备数据库 |
-| `setup_catalog.py` | 4 | 创建 / 启用 Catalog 并扫描表 |
-| `bind_kn_resources.py` | 5 | 对象类绑定 Catalog 资源 |
-| `smoke_test.py` | 验收 | KN 名称、OT 行数、DB 联接命中率 |
+| Script | Step | Description |
+|--------|------|-------------|
+| `import_kn.py` | 2 | Import `kn/supply_ontology_hand.json` |
+| `load_sample_data.py` | 3 | Load `data/*.csv` into your database |
+| `setup_catalog.py` | 4 | Create / enable Catalog and discover tables |
+| `bind_kn_resources.py` | 5 | Bind object types to Catalog resources |
+| `smoke_test.py` | Verify | KN name, OT row counts, join hit rates |
 
-## 包内结构
+## Package layout
 
 ```
 supply_ontology_hand/
 ├── kn/supply_ontology_hand.json
-├── data/                    # 12 张体验表 CSV
+├── data/
 ├── tools/
-│   ├── config.example.yaml
-│   ├── mapping/object_table_map.yaml
-│   └── tests/
-└── docs/
-    ├── openbkn-hand-import-guide.md
-    ├── openbkn-hand-import-guide_cn.md
-    ├── agent-scenario-kn-capability-design.md
-    └── agent-scenario-kn-capability-design_cn.md
+└── docs/          # EN + _cn guides (see table above)
 ```
 
-## 场景扩展（可选）
-
-见 [Agent 场景能力设计（English）](docs/agent-scenario-kn-capability-design.md) / [中文](docs/agent-scenario-kn-capability-design_cn.md)（S1～S6 场景地图与标杆场景说明）。
-
-## 依赖
+## Dependencies
 
 ```bash
 cd tools
