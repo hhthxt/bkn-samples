@@ -15,6 +15,7 @@ Official OpenBKN experience samples: knowledge network models, sample data, and 
 | Sample | KN ID | Description |
 |--------|-------|-------------|
 | [supply_ontology_hand](samples/supply_ontology_hand/) | `supply_ontology_hand` | Supply chain ontology hand edition: CSV load → Catalog scan → OT bind → Agent scenarios |
+| [world-cup](samples/world-cup/) | `worldcup_vega_catalog_bkn` | 27 public World Cup CSVs (CC-BY-SA) → MySQL → Vega catalog → BKN push + index build → published `vega_sql_execute` tool. Single `./run.sh`, six idempotent steps |
 
 > More samples coming (e.g. `supply-chain-skill`).
 
