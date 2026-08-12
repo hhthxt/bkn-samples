@@ -15,6 +15,7 @@ OpenBKN 官方体验样例集合：知识网络模型、样例数据与分步导
 | Sample | KN ID | 说明 |
 |--------|-------|------|
 | [supply_ontology_hand](samples/supply_ontology_hand/) | `supply_ontology_hand` | 供应链本体手工体验：CSV 灌库 → Catalog 扫描 → 对象类绑定 → Agent 场景体验 |
+| [world-cup](samples/world-cup/) | `worldcup_vega_catalog_bkn` | 27 份公开世界杯 CSV（CC-BY-SA）→ MySQL → Vega Catalog → BKN 推送与索引构建 → 发布 `vega_sql_execute` 工具。单脚本 `./run.sh`，六步幂等 |
 
 > 更多 sample 将陆续加入（如 `supply-chain-skill`）。
 
