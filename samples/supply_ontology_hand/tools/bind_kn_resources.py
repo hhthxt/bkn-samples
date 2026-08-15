@@ -191,6 +191,7 @@ def run_bind(
     mapping: dict,
     *,
     dry_run: bool = False,
+    table_prefix: str = "",
     run_cmd: Callable[[list[str]], str] | None = None,
 ) -> dict:
     """Bind OTs with bind:true to catalog resources; return execution report."""
@@ -219,7 +220,7 @@ def run_bind(
             report["skipped"].append({"object_type_id": ot_id, "reason": "bind:false"})
             continue
 
-        table = obj["table"]
+        table = table_prefix + obj["table"]
         resource_id = find_resource_id(catalog_id, table, schema=schema, run_cmd=cmd)
         if not resource_id:
             raise RuntimeError(f"resource not found for table {table!r} (OT {ot_id})")
@@ -292,13 +293,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--config", required=True, help="Path to config.yaml")
     parser.add_argument("--dry-run", action="store_true", help="Print OT→table→resource_id only")
     parser.add_argument("--mapping", default=str(_DEFAULT_MAP), help="Path to OT→table mapping YAML")
+    parser.add_argument("--table-prefix", default=None, help="Prefix on destination table names, e.g. hand_")
     args = parser.parse_args(argv)
 
     try:
         config = load_config(Path(args.config))
         mapping = load_mapping(Path(args.mapping))
         dry_run = args.dry_run or bool((config.get("bind") or {}).get("dry_run"))
-        report = run_bind(config, mapping, dry_run=dry_run)
+        table_prefix = args.table_prefix
+        if table_prefix is None:
+            table_prefix = (config.get("load") or {}).get("table_prefix", "")
+        report = run_bind(config, mapping, dry_run=dry_run, table_prefix=table_prefix)
         if dry_run:
             print_dry_run_lines(report)
         else:

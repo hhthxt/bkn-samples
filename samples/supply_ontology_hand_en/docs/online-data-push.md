@@ -46,6 +46,14 @@ python3 tools/load_sample_data.py --interactive --table-prefix hand_
 
 The script prompts for PostgreSQL connection details and hides the password. It tests the connection first and only writes after the operator types `yes`; destination tables are named `hand_<original_table>`.
 
+After loading the tables, use the same connection details to create the dedicated physical Catalog:
+
+```bash
+python3 tools/setup_catalog.py --interactive --table-prefix hand_ --write-config
+```
+
+This defaults to `Supply_Ontology_Hand_POC`, tests the connection, creates or reuses that dedicated Catalog, runs Discover, and verifies the 12 `hand_` tables. Do not configure `RT_Supply_Data` for this sample.
+
 Do not overwrite existing business tables. Isolate this sample with a prefix:
 
 ```bash

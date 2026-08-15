@@ -27,7 +27,8 @@ python3 tools/load_sample_data.py --interactive --table-prefix hand_
 cd tools
 python3 load_sample_data.py --config config.yaml
 python3 import_kn.py --json ../kn/supply_ontology_hand.json
-python3 bind_kn_resources.py --config config.yaml --kn-id supply_ontology_hand
+python3 setup_catalog.py --interactive --table-prefix hand_ --write-config
+python3 bind_kn_resources.py --config config.yaml --kn-id supply_ontology_hand --table-prefix hand_
 python3 verify_sample.py --config config.yaml --kn-id supply_ontology_hand
 ```
 

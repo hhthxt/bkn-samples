@@ -46,6 +46,14 @@ python3 tools/load_sample_data.py --interactive --table-prefix hand_
 
 脚本会提示 PostgreSQL 连接信息，密码不回显；连接测试成功后必须输入 `yes` 才开始写入，目标表名为 `hand_<原表名>`。
 
+数据库表导入后，使用同一组连接信息创建独立物理 Catalog：
+
+```bash
+python3 tools/setup_catalog.py --interactive --table-prefix hand_ --write-config
+```
+
+该命令默认使用 `Supply_Ontology_Hand_POC`，会测试连接、创建/复用同名新 Catalog、Discover，并核对 12 张 `hand_` 表。不要把 `RT_Supply_Data` 填入配置。
+
 不要把现有业务表直接覆盖。用前缀隔离本 sample：
 
 ```bash
