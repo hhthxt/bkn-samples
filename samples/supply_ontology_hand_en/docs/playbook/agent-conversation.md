@@ -89,6 +89,20 @@ Agent 传入事件，而不是让模型直接拼接 Action SQL：
 
 ## Agent 必须遵守的规则
 
+## Orchestration Skill calls
+
+When the Agent recalls S1/S2/S3, the Skill returns an orchestration contract rather than an independent shell script. The Agent retains the two Interaction IDs, retrieves evidence once through Context Loader, passes `resolved_context` unchanged to the Toolbox function, and renders the report according to the Skill.
+
+```text
+Skill contract
+→ Context Loader (once)
+→ resolved_context + bkn_context
+→ Toolbox function
+→ Agent report
+```
+
+If a managed Toolbox call is unavailable, report that the platform execution adapter is incomplete; do not substitute an offline CLI result for online evidence.
+
 - 缺少产品、预测单、数量、截止日或替代策略时先追问，不猜测；
 - 不把 S1 的风险直接改写成客户承诺；
 - 不把成品库存、理论可产、合计可售和齐套净需求混为一谈；

@@ -29,9 +29,11 @@
 | scenario accuracy | 1.00 |
 | governance boundary accuracy | 1.00 |
 | 独立断言总数 | 14 |
-| 全量自动化测试 | 206 passed |
+| 全量自动化测试 | 238 passed (including 6 orchestration-contract tests) |
 
 独立评测覆盖产品/物料/供应商/订单/仓库、库存、预测需求、未关闭预测单，以及 S1 倒排、S2 可售、Action 仅提议不直接写入等边界。
+
+The new orchestration contract verifies that the Agent passes its retained `conversation_id` / `interaction_id` through `bkn_context`, passes the existing `resolved_context` and dataset receipts directly to the Toolbox request, and rejects missing trace IDs, receipts, required datasets, or substitution policy before function invocation. The adapter does not persist, query, or execute Actions.
 
 ## 3. Action Gateway 验证
 

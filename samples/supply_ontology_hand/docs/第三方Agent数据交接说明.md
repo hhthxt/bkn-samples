@@ -34,6 +34,23 @@ bkn_start_interaction
 6. **禁止伪造** receipt。没有官方查询回执就不要调用函数。
 7. **禁止 CSV** 作为运行时输入。CSV 只用于离线夹具和黄金对照，不进生产请求。
 
+## 编排型 Skill 的执行方式
+
+S1/S2/S3 是编排型 Skill，不要求通过 `execute_skill` 运行 shell 命令。第三方 Agent 先通过 `find_skills` / `get_skill_content` 读取 Skill 契约，再按契约调用 Context Loader 和 Toolbox。
+
+Agent 已经保存的 `conversation_id`、`interaction_id` 不需要另建存储；每次调用时原样放入 `bkn_context`。Agent 已经取得的 `resolved_context` 也不需要再次持久化，直接作为 Toolbox 请求输入。
+
+```text
+find_skills / get_skill_content
+→ Context Loader 查询一次并保存 receipt
+→ Agent 组装 resolved_context
+→ backward_plan(resolved_context, bkn_context, parameters)
+→ Agent 按 Skill 输出契约生成报告
+→ 有需要时提出 Action，等待人工确认
+```
+
+Skill 不自行查询、函数不自行查询，Agent 不得脱离快照重算或伪造证据。当前 POC 若未提供受管 Toolbox 调用入口，只能验证 Skill 召回和本地编排契约，不能宣称线上 Skill 执行闭环通过。
+
 ## `resolved_context` 形状
 
 ```json

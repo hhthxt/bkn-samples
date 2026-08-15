@@ -34,6 +34,23 @@ bkn_start_interaction
 6. **禁止伪造** receipt。没有官方查询回执就不要调用函数。
 7. **禁止 CSV** 作为运行时输入。CSV 只用于离线夹具和黄金对照，不进生产请求。
 
+## Execution model for orchestration Skills
+
+S1/S2/S3 are orchestration Skills; they do not need to run a shell command through `execute_skill`. The third-party Agent first reads the Skill contract through `find_skills` / `get_skill_content`, then calls Context Loader and the Toolbox according to that contract.
+
+The Agent already retains `conversation_id` and `interaction_id`; no second persistence layer is required. Pass them unchanged in `bkn_context` on every managed call. The Agent's existing `resolved_context` is also an in-memory request input, not a new storage requirement.
+
+```text
+find_skills / get_skill_content
+→ query Context Loader once and retain receipts
+→ Agent assembles resolved_context
+→ backward_plan(resolved_context, bkn_context, parameters)
+→ Agent renders the Skill-defined report
+→ propose an Action when needed and wait for human approval
+```
+
+The Skill does not query, the function does not query, and the Agent must not recalculate outside the snapshot or fabricate evidence. If the POC does not expose a managed Toolbox call, validate only Skill recall and the local orchestration contract; do not claim that the online Skill execution loop has passed.
+
 ## `resolved_context` 形状
 
 ```json

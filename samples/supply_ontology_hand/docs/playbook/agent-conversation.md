@@ -89,6 +89,20 @@ Agent 传入事件，而不是让模型直接拼接 Action SQL：
 
 ## Agent 必须遵守的规则
 
+## 编排型 Skill 调用
+
+当 Agent 命中 S1/S2/S3 时，Skill 返回的是编排契约，不是一个需要独立 shell 执行的脚本。Agent 应保留当前 Interaction 的两个 ID，完成一次 Context Loader 取证后，将 `resolved_context` 原样交给对应 Toolbox 函数，再按 Skill 生成报告。
+
+```text
+Skill contract
+→ Context Loader（一次）
+→ resolved_context + bkn_context
+→ Toolbox function
+→ Agent report
+```
+
+缺少受管 Toolbox 调用入口时，必须明确报告“平台执行适配未完成”，不得用离线 CLI 结果替代线上证据。
+
 - 缺少产品、预测单、数量、截止日或替代策略时先追问，不猜测；
 - 不把 S1 的风险直接改写成客户承诺；
 - 不把成品库存、理论可产、合计可售和齐套净需求混为一谈；

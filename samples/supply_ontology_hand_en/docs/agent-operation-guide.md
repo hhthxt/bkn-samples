@@ -61,3 +61,20 @@ Can product `U00-000080` be delivered by `2026-10-31` in a quantity of `3000`? T
 4. Call the function that calculates the deliverable quantity.
 5. Return the conclusion, evidence, and risks.
 6. Show a dry-run and impact scope before any Action and wait for confirmation.
+
+## Executing orchestration Skills
+
+S1/S2/S3 are orchestration Skills. The Agent reads the contract with `find_skills` / `get_skill_content`, then performs the managed data retrieval and function call. Do not invoke S1 as an `execute_skill` shell command without business parameters.
+
+No additional context store is required: pass the existing `conversation_id` and `interaction_id` unchanged in `bkn_context`, assemble the existing snapshots and `bkn_receipt` values into `resolved_context`, and pass that object directly to `backward_plan`. The function calculates only; it does not query a database. The Agent renders the report according to the Skill contract.
+
+The online call relationship is:
+
+```text
+Context Loader(bkn_context)
+→ resolved_context(rows + receipts)
+→ Toolbox backward_plan(bkn_context + resolved_context + parameters)
+→ Agent report
+```
+
+If the POC Context Loader does not yet expose a managed Toolbox call, complete the local contract validation and mark online execution as pending platform support. Do not use CSV, offline CLI, or an untraced direct call as a substitute for online success.

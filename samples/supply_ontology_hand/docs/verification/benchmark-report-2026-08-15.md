@@ -29,9 +29,11 @@
 | scenario accuracy | 1.00 |
 | governance boundary accuracy | 1.00 |
 | 独立断言总数 | 14 |
-| 全量自动化测试 | 206 passed |
+| 全量自动化测试 | 238 passed（含 Agent 编排契约 6 项） |
 
 独立评测覆盖产品/物料/供应商/订单/仓库、库存、预测需求、未关闭预测单，以及 S1 倒排、S2 可售、Action 仅提议不直接写入等边界。
+
+新增 Agent 编排契约验证：Agent 保存的 `conversation_id` / `interaction_id` 只通过 `bkn_context` 透传；已取得的 `resolved_context` 和各数据集 receipt 直接作为 Toolbox 请求输入；缺少任一追踪 ID、receipt、必需数据集或替代料策略时，在函数调用前拒绝。该适配器不持久化、不查库、不执行 Action。
 
 ## 3. Action Gateway 验证
 

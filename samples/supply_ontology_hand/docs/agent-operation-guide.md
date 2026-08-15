@@ -62,4 +62,21 @@ python3 tools/bootstrap_action_layer.py \
 5. 输出结论、证据和风险。
 6. 涉及行动时先展示 dry-run 和影响范围，再等待人工确认。
 
+## 编排型 Skill 的实际执行
+
+S1/S2/S3 是编排型 Skill。Agent 先用 `find_skills` / `get_skill_content` 读取契约，然后自己完成受管查询和函数调用；不要把 S1 作为没有业务参数的 `execute_skill` shell 命令调用。
+
+Agent 不需要额外保存上下文副本：已有的 `conversation_id`、`interaction_id` 原样放入每次调用的 `bkn_context`，已有的查询快照和 `bkn_receipt` 组装成 `resolved_context` 后直接传给 `backward_plan`。函数只计算，不查库；报告由 Agent 按 Skill 输出契约生成。
+
+在线闭环的关键请求关系是：
+
+```text
+Context Loader(bkn_context)
+→ resolved_context(rows + receipts)
+→ Toolbox backward_plan(bkn_context + resolved_context + parameters)
+→ Agent report
+```
+
+如果当前 POC 的 Context Loader 尚未提供受管 Toolbox 调用入口，先完成本地契约验证并将在线执行标记为待平台能力补齐；不得改用 CSV、离线 CLI 或无 Trace 的直连调用冒充在线通过。
+
 完整对话样例见 [Playbook](playbook.md)。
