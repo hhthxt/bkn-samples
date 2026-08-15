@@ -23,7 +23,7 @@ def resolve_path(root: Path, value: str) -> Path:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Create and bind Action Dataset tables")
-    parser.add_argument("--config", default="config.poc.yaml")
+    parser.add_argument("--config", default="config.yaml")
     parser.add_argument("--mapping", default="mapping/action_dataset_map.yaml")
     parser.add_argument("--apply", action="store_true")
     parser.add_argument("--dry-run", action="store_true")

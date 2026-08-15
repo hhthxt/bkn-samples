@@ -79,8 +79,8 @@ curl http://127.0.0.1:8765/health
 Agent 模式可用以下命令一次完成幂等建表、三张表验收和对象类绑定；密码只在提示时输入，不写入配置：
 
 ```bash
-python3 tools/bootstrap_action_layer.py \
-  --config tools/config.yaml \
+python3 bootstrap_action_layer.py \
+  --config config.yaml \
   --interactive --apply
 ```
 

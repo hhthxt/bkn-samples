@@ -1,7 +1,5 @@
 # 供应链本体 · 手工体验包
 
-[English](./README.md)
-
 - **Sample slug:** `supply_ontology_hand`
 - **KN ID:** `supply_ontology_hand`
 - **名称:** 供应链本体知识网络-手工版
@@ -12,7 +10,7 @@
 
 | 文档 | 说明 |
 |------|------|
-| [导入说明书](docs/openbkn-hand-import-guide_cn.md) · [English](docs/openbkn-hand-import-guide.md) | 步骤 1～7：导入 KN → 灌库 → 扫描 → 绑定 |
+| [导入说明书](docs/openbkn-hand-import-guide_cn.md) | 步骤 1～7：导入 KN → 灌库 → 扫描 → 绑定 |
 | [场景驱动的供应链动态能力设计](docs/场景驱动的供应链动态能力设计.md) | **主设计**（钉死本网 + CSV 样例；对照计划协同逻辑，不依赖其界面） |
 | [能力口径清单](docs/能力口径清单.md) | 指标 / 函数 / 技能 / 行动口径 |
 | [业务问答测试集](docs/业务问答测试集.md) | 每条能力 5–10 道业务题 + CSV 快照答案 |
@@ -47,7 +45,7 @@ python3 run_scenario.py --scenario fulfillment-commitment \
 ### 再接入 OpenBKN
 
 1. 复制 `tools/config.example.yaml` → `tools/config.yaml`，填写数据库与 OpenBKN 环境信息
-2. 按 [openbkn-hand-import-guide_cn.md](docs/openbkn-hand-import-guide_cn.md) 步骤 1～7 执行（[English](docs/openbkn-hand-import-guide.md)）
+2. 按 [openbkn-hand-import-guide_cn.md](docs/openbkn-hand-import-guide_cn.md) 步骤 1～7 执行。
 3. 冒烟验收后做动力层（步骤 8）：
 
 ```bash

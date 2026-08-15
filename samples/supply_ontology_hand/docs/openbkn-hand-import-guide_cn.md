@@ -1,7 +1,5 @@
 # OpenBKN 手工体验导入说明书
 
-[English](./openbkn-hand-import-guide.md)
-
 **版本：** v0.3  
 **状态：** 已发布至 [bkn-samples](https://github.com/openbkn-ai/bkn-samples)；步骤 3～5 可脚本化执行；P0 环境验收见附录 D  
 **交付包：** `samples/supply_ontology_hand/`（仓库 [openbkn-ai/bkn-samples](https://github.com/openbkn-ai/bkn-samples)）  
@@ -337,7 +335,7 @@ python3 load_sample_data.py --config config.yaml
 
 - 步骤 3 已完成（目标库中 12 表有数据）
 - 本机已 `openbkn auth login` 且 `openbkn auth status` 正常
-- OpenBKN 平台能访问 PostgreSQL/MySQL（常见：OpenBKN 在 Docker/K8s 内，需用 `vega.catalog_host: host.docker.internal` 访问宿主机数据库；本机灌库脚本仍用 `database.host: 127.0.0.1`）
+- OpenBKN 平台能访问 PostgreSQL/MySQL（`vega.catalog_host` 必须填写从平台容器/集群可解析、可连接的数据库主机；不得假定 `host.docker.internal` 在远程 POC 或伙伴环境存在。本机灌库使用 `database.host`。）
 
 **配置文件（`tools/config.yaml`）：**
 
@@ -346,7 +344,7 @@ python3 load_sample_data.py --config config.yaml
 | 字段 | 说明 |
 |------|------|
 | `catalog_name` | 新建 Catalog 名称（默认可用 `supply-demo-hand`） |
-| `catalog_host` | OpenBKN **连库用**主机名（Docker 部署时常为 `host.docker.internal`） |
+| `catalog_host` | OpenBKN **连库用**主机名；必须由部署者验证平台网络可达，不能照抄 `host.docker.internal` |
 | `catalog_id` | 首次留空；脚本成功后可 `--write-config` 自动回写 |
 | `connector_type` | PostgreSQL 填 `postgresql`；MySQL 填 `mysql` |
 
@@ -474,7 +472,7 @@ openbkn --json bkn object-type query supply_ontology_hand supply_ontology_hand_p
 
 **权威场景说明（扩展阅读）：**
 
-- 同目录文档：[agent-scenario-kn-capability-design_cn.md](./agent-scenario-kn-capability-design_cn.md) · [English](./agent-scenario-kn-capability-design.md)
+- 同目录文档：[agent-scenario-kn-capability-design_cn.md](./agent-scenario-kn-capability-design_cn.md)
 - **§2 场景地图**：S1～S6 能力形态一览（Skill / Metric / Action 分工）
 - **§3 标杆场景 S1**：生产计划倒排 · 齐套诊断（输入、对象关系、规则与输出门槛）
 - 体验包默认知识网络 ID 为 **`supply_ontology_hand`**（场景文档正文中的 `supplychain_hd0202` 须按文首「体验包说明」替换）

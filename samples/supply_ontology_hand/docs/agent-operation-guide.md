@@ -24,7 +24,7 @@ Agent → OpenBKN API / openbkn CLI → KN、Resource、Skill、Function、Actio
 
 ```bash
 cp tools/config.example.yaml tools/config.yaml
-# 编辑 tools/config.yaml：填写本环境 database.* 与 vega.catalog_name；不要提交该文件。
+# 编辑 tools/config.yaml：填写本环境 database.*、平台可达的 vega.catalog_host 与唯一的 vega.catalog_name；不要提交该文件。
 openbkn auth status
 python3 tools/import_kn.py --json kn/supply_ontology_hand.json --dry-run
 python3 tools/setup_catalog.py --config tools/config.yaml --write-config

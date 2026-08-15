@@ -1,5 +1,7 @@
 # Supply Ontology Hand POC 验证报告
 
+> 历史 POC 证据，仅用于复核当时测试结果。下文数据库名、Catalog 名、资源 ID 和命令中的 `config.poc.yaml` 均不得复制到第三方部署；请以 `manual-operation-guide.md`、`agent-operation-guide.md` 和 `online-data-push.md` 的可移植步骤为准。
+
 日期：2026-08-15  
 目标环境：`https://poc.openbkn.ai/`  
 目标知识网络：`supply_ontology_hand`  
