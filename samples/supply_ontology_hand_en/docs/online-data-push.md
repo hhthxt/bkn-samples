@@ -3,12 +3,14 @@
 ## Recommended order
 
 ```text
-Validate CSV → choose a writable physical Catalog → upload with a prefix → verify resources → bind object types → register metrics
+Create a dedicated database/connection → create a dedicated physical Catalog → load sample tables → Discover → verify resources → bind object types → register metrics
 ```
 
 ## Agent/API mode
 
-A physical Catalog is not a file-upload container. It is a directory over a connected data source. The correct chain is: write the data into the database first, then let Catalog Discover scan the tables and create resources.
+A physical Catalog is not a file-upload container. The supply sample must use a dedicated database and Catalog; do not reuse the existing POC `RT_Supply_Data`, otherwise sample data will be mixed with real data. Suggested names are database `supply_ontology_hand_poc` and Catalog `Supply_Ontology_Hand_POC`.
+
+The correct chain is: create the dedicated database connection and database, load the sample tables, then let the new Catalog Discover scan the tables and create resources.
 
 ```text
 PostgreSQL/MySQL database (write sample tables)
@@ -34,7 +36,7 @@ print('CSV shape check passed')
 PY
 ```
 
-`create-from-csv` is only a convenience dataflow entry point; writability is not an inherent property of a physical Catalog. If the target environment enables this dataflow, use it. Otherwise, create prefixed tables through the database connection or an approved database import flow, then run Catalog Discover.
+`create-from-csv` is only a convenience dataflow entry point; writability is not an inherent property of a physical Catalog. If the target environment enables this dataflow, use a dedicated Catalog. Otherwise, create prefixed tables through the dedicated database connection, then run Discover on the new Catalog.
 
 The sample includes the database push script; operators do not need to write INSERT statements:
 

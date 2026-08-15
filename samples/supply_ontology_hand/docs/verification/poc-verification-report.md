@@ -4,7 +4,7 @@
 环境：`https://poc.openbkn.ai`  
 模式：Agent API / CLI
 
-已确认 POC 的 `RT_Supply_Data` 是健康的物理 PostgreSQL Catalog，连接到 `Supply_Data` 数据库；当前问题不是 Catalog 没有连接，而是 sample CSV 尚未写入该数据库，且 CSV dataflow 接口返回 HTTP 404。
+已确认 POC 的 `RT_Supply_Data` 是健康的物理 PostgreSQL Catalog，连接到 `Supply_Data` 数据库。后续不再复用它；sample 应创建独立数据库和独立物理 Catalog，避免与现有真实数据混合。当前 CSV dataflow 接口返回 HTTP 404。
 
 ## 已通过
 

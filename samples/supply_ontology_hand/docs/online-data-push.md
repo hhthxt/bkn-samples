@@ -3,12 +3,14 @@
 ## 推荐顺序
 
 ```text
-检查 CSV → 选择可写入的物理 Catalog → 带前缀上传 → 核验资源 → 绑定对象类 → 再注册指标
+新建独立数据库/连接 → 新建物理 Catalog → 导入 sample 表 → Discover → 核验资源 → 绑定对象类 → 再注册指标
 ```
 
 ## Agent/API 模式
 
-物理 Catalog 不是文件上传容器。它只是已连接的数据源的目录；正确链路是：先把数据写入数据库，再让 Catalog Discover 扫描出表和资源。
+物理 Catalog 不是文件上传容器。供应链 sample 必须使用独立数据库和独立 Catalog，不得复用 POC 现有的 `RT_Supply_Data`，避免 sample 数据与真实供应链数据混合。建议数据库名为 `supply_ontology_hand_poc`，Catalog 名为 `Supply_Ontology_Hand_POC`。
+
+正确链路是：先创建独立数据库连接和数据库，再写入 sample 表，最后让新 Catalog Discover 扫描出表和资源。
 
 ```text
 PostgreSQL/MySQL 数据库（写入 sample 表）
@@ -34,7 +36,7 @@ print('CSV shape check passed')
 PY
 ```
 
-`create-from-csv` 只是平台提供的便捷数据流入口，不是物理 Catalog 的基本属性。若目标环境已启用该数据流，可使用它；否则应先通过数据库连接（或平台允许的数据库导入流程）创建带前缀的表，再运行 Catalog discover。
+`create-from-csv` 只是平台提供的便捷数据流入口，不是物理 Catalog 的基本属性。若目标环境已启用该数据流，也应指定独立 Catalog；否则应先通过独立数据库连接创建带前缀的表，再运行新 Catalog Discover。
 
 本 sample 自带数据库推送脚本；交付/POC 操作者没有必要手写 INSERT：
 

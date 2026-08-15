@@ -4,7 +4,7 @@ Date: 2026-08-15
 Environment: `https://poc.openbkn.ai`  
 Mode: Agent API / CLI
 
-POC `RT_Supply_Data` has been confirmed as a healthy physical PostgreSQL Catalog connected to the `Supply_Data` database. The issue is not a missing Catalog connection; the sample CSVs have not been written to that database, and the CSV dataflow endpoint returns HTTP 404.
+POC `RT_Supply_Data` has been confirmed as a healthy physical PostgreSQL Catalog connected to the `Supply_Data` database. It will no longer be reused; the sample should use a dedicated database and physical Catalog to avoid mixing with existing real data. The CSV dataflow endpoint currently returns HTTP 404.
 
 ## Passed
 
