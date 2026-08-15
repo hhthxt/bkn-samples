@@ -5143,6 +5143,31 @@
           "name": "status",
           "display_name": "Status",
           "type": "text"
+        },
+        {
+          "name": "version",
+          "display_name": "Version",
+          "type": "text"
+        },
+        {
+          "name": "business_domain_id",
+          "display_name": "Business Domain ID",
+          "type": "text"
+        },
+        {
+          "name": "kn_id",
+          "display_name": "Knowledge Network ID",
+          "type": "text"
+        },
+        {
+          "name": "object_type_ids",
+          "display_name": "Skill Object Scope",
+          "type": "json"
+        },
+        {
+          "name": "skill_query",
+          "display_name": "Skill Query",
+          "type": "text"
         }
       ],
       "primary_keys": [

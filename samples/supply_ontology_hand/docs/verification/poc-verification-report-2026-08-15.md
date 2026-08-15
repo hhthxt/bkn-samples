@@ -97,4 +97,4 @@ S1 结论：**不能证明按 2026-05-31 交付 3000 台；当前证据应判定
 3. `tools/bind_skill_dataset.py`：Discover 后按 Resource 绑定 `skills`
 4. 中英文测试与 Agent/手工手册说明
 
-POC 还需操作者执行一次带数据库密码的命令，随后重新 Discover 和绑定；在此之前，Skill 召回不计入 POC 通过项。
+POC 已完成该补充步骤：`public.skills` Resource ID 为 `da01diljdthc73bmqf10`，对象类 `skills` 已绑定并补齐 `object_type_ids` / `skill_query` 等物理映射。通过可追踪 Context Loader Interaction 成功召回 3 个已发布 Skill：S1、S2、S3。Skill Registry 现计入 POC 通过项。

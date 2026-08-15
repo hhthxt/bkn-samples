@@ -81,4 +81,4 @@ During `find_skills` validation, the POC object class `skills` was found with a 
 3. `tools/bind_skill_dataset.py` to bind `skills` to the discovered Resource
 4. Matching English/Chinese tests and Agent/manual documentation
 
-The POC operator must run the password-protected database step once, then Discover and bind the Resource. Until that is done, Skill recall is not counted as passed.
+The supplemental POC step is now complete: Resource ID `da01diljdthc73bmqf10` is bound to object class `skills`, with `object_type_ids`, `skill_query`, and the other physical mappings exposed. A traceable Context Loader Interaction successfully recalled three published Skills: S1, S2, and S3. Skill Registry is now counted as passed for the POC.

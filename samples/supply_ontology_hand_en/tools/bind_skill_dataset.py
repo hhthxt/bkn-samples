@@ -14,6 +14,16 @@ def build_binding(kn_id: str, object_type_id: str, resource_id: str) -> dict:
     return {"kn_id": kn_id, "object_type_id": object_type_id, "data_source": {"type": "resource", "id": resource_id}}
 
 
+def ensure_skill_registry_properties(body: dict) -> None:
+    properties = body.setdefault("data_properties", [])
+    existing = {item.get("name") for item in properties}
+    for name, prop_type in (("version", "text"), ("business_domain_id", "text"), ("kn_id", "text"), ("object_type_ids", "json"), ("skill_query", "text")):
+        if name not in existing:
+            properties.append({"name": name, "display_name": name, "type": prop_type})
+    for item in properties:
+        item.setdefault("mapped_field", {"name": item["name"], "type": item.get("type", "text")})
+
+
 def run(args: list[str]) -> dict:
     proc = subprocess.run(["openbkn", "--json", *args], check=False, capture_output=True, text=True)
     if proc.returncode:
@@ -41,6 +51,7 @@ def main() -> None:
     if isinstance(current, dict) and isinstance(current.get("entries"), list):
         current = current["entries"][0]
     body = copy.deepcopy(current)
+    ensure_skill_registry_properties(body)
     body["data_source"] = binding["data_source"]
     with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".json", delete=False) as handle:
         json.dump(body, handle, ensure_ascii=False)
