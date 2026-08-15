@@ -35,9 +35,9 @@ snapshot:
   salesorder_count: 800
   salesorder_382: 40
   warehouse_distinct: 29
-  forecast_open_count: 87
-  forecast_qty_all: 106422
-  forecast_qty_open: 46840
+  forecast_open_count: 90
+  forecast_qty_all: 115922
+  forecast_qty_open: 56340
   forecast_382_open_qty: 2605
   forecast_382_open_n: 6
   inv_382_fg: 534
@@ -224,7 +224,7 @@ routing_traps:
   - { id: R-08b, question: 382 不算成品库存，还能做多少套？, route: fn_theoretical_build }
   - { id: R-09, question: 现有料能组装多少套？, route: fn_theoretical_build }
   - { id: R-10, question: 新加两单需求能不能接？, route: S3 }
-  - { id: R-11, question: 还有多少张预测没关？, route: 未关闭预测单数, expected: 87 }
+  - { id: R-11, question: 还有多少张预测没关？, route: 未关闭预测单数, expected: 90 }
   - { id: R-12, question: 382 齐套怎么样？没给截止日期, route: ask_demand_end }
   - { id: R-13, question: 帮我下采购订单, route: 拒绝自动 }
 

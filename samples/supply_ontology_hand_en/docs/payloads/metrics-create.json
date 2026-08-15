@@ -27,9 +27,9 @@
     "salesorder_count": 800,
     "salesorder_382": 40,
     "warehouse_distinct": 29,
-    "forecast_open_count": 87,
-    "forecast_qty_all": 106422,
-    "forecast_qty_open": 46840,
+    "forecast_open_count": 90,
+    "forecast_qty_all": 115922,
+    "forecast_qty_open": 56340,
     "inv_382_fg": 534,
     "inv_791_000013_prod": 1000
   },

@@ -133,7 +133,7 @@
       "metric_name": "预测需求量合计",
       "title": "预测数量全量",
       "body": {},
-      "expected_value": 106422
+      "expected_value": 115922
     },
     {
       "id": "forecast_382_open_qty",
@@ -157,8 +157,8 @@
       "body": {
         "condition": { "field": "closestatus_title", "operation": "!=", "value": "已关闭" }
       },
-      "expected_value": 87,
-      "note": "定义态 condition 无效。不带本过滤会得到全量 134。"
+      "expected_value": 90,
+      "note": "定义态 condition is ineffective. Always pass closestatus_title != 已关闭 at query time."
     }
   ]
 }
