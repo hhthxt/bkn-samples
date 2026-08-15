@@ -72,3 +72,9 @@ Upload success does not mean the tools are enabled. Check each tool status in th
 ## Q13: Why can an Action Dataset not use `data_source.type=dataset` directly?
 
 An Action Dataset is a database table first. In OpenBKN, an object type must bind to the Resource created by physical Catalog Discover. The required order is: create tables, Discover the Catalog, resolve `resource_id`, then bind with `data_source.type=resource`. `bootstrap_action_layer.py` performs these steps automatically.
+
+## Q14: Why does the web/in-app Agent miss POC data while the CLI finds it?
+
+Do not assume the data load failed. First read back the `kn_id`, Catalog, and object-type `data_source` actually used by the Agent. The fixed read-only POC entry point is the authenticated `openbkn context` CLI. If the in-app connector returns public/old Resources, the environments are routed differently; stop business acceptance and switch to the POC Context Loader. Never use old-resource results as POC evidence.
+
+The first Interaction must return a `conversation_id` and `interaction_id`; reuse both for later Context Loader calls and finish with `bkn_finish_interaction`.

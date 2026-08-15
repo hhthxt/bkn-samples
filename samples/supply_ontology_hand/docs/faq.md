@@ -72,3 +72,16 @@ POC 的 Toolbox 名称只允许中文、英文字母、数字和下划线。不�
 ## Q13：为什么 Action Dataset 不能直接用 `data_source.type=dataset` 绑定？
 
 Action Dataset 首先是数据库表；对象类在 OpenBKN 中必须绑定物理 Catalog Discover 出来的 Resource。因此正确顺序是：建表 → Catalog Discover → 获取 `resource_id` → 用 `data_source.type=resource` 绑定。`bootstrap_action_layer.py` 已自动执行这四步。
+
+## Q14：为什么网页/内置 Agent 查询不到 POC 数据，但 CLI 能查到？
+
+先不要判断数据导入失败。必须先回读当前 Agent 实际使用的 `kn_id`、Catalog 和对象类 `data_source`。POC 的固定只读验证入口是已认证的 `openbkn context` CLI；如果内置连接器返回公共/旧 Resource，说明环境路由不一致，应停止业务验收并切换到 POC Context Loader。不能用旧资源的查询结果替代 POC 证据。
+
+验证命令示例：
+
+```bash
+openbkn --json context tool-call supply_ontology_hand bkn_start_interaction \\
+  --args '{"agent_name":"supply_ontology_hand_poc_agent","question":"请验证产品 U00-000080 的预测证据。"}'
+```
+
+后续查询必须复用返回的 `conversation_id` 和 `interaction_id`，并在结束时调用 `bkn_finish_interaction`。

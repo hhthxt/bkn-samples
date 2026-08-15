@@ -43,6 +43,17 @@ All three object types read back with `data_source.type=resource` and the expect
 }
 ```
 
-## Environment-routing boundary
+## Agent Interaction verification
 
-One Context Loader business query was deliberately excluded from the POC pass result: the session returned public/old resource bindings and no row for forecast `0000023181`. Before customer or ecosystem acceptance, the Agent interface must first verify the active knowledge network and its Catalog/Resource bindings. If old resources are returned, stop the business test and correct environment routing.
+A traceable read-only Interaction was completed through the authenticated POC CLI Context Loader:
+
+- `conversation_id`: `conv_ebf77eb23300783b9bc396203ac4369`
+- `interaction_id`: `int_164102eccbc4f239601ec1706b6e8d8a`
+- Forecast object: `supply_ontology_hand_forecast`
+- Product: `U00-000080`
+- Matched instance: `id=0000023181`, quantity `3000`, due date `2026-05-31`, status `正常`
+- Interaction: `completed`; `evidence_status=complete`
+
+An earlier query through the in-app connector returned old/public resources. That was an environment-routing issue in the connector, not a POC data issue. Customer and ecosystem acceptance must verify the active KN ID and Catalog/Resource bindings first. If old resources are returned, stop the business test and correct routing.
+
+This Interaction verified the forecast fact only. Fulfillment still requires the S1 evidence chain: finished-goods inventory, primary BOM materials, material inventory, purchasing/production plans, and delivery dates, with substitute usage explicitly disabled.

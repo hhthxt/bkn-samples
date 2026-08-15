@@ -59,8 +59,17 @@ python3 tools/bootstrap_action_layer.py \\
 
 Playbook 行为用例全部通过，覆盖澄清、证据优先、技能调用顺序、Action 提议和人工批准边界。
 
-## 未纳入通过结论的事项
+## Agent Interaction 验证
 
-通过 Context Loader 进行的一次真实业务查询没有作为 POC 证据纳入：当前会话返回的是公共/旧资源绑定，查询预测单 `0000023181` 无结果。这说明在客户/生态环境验收时，必须先核对会话实际使用的知识网络 ID、Catalog/Resource 绑定和环境路由，避免把旧 KN 当成 POC KN。
+通过已认证的 POC CLI Context Loader 完成了一次可追踪只读 Interaction：
 
-下一轮客户验收应使用 POC Agent 接口，先回读 `supply_ontology_hand` 的对象类和 Resource，再执行业务问题；如返回旧资源，应先停止业务测试并修正环境路由。
+- `conversation_id`: `conv_ebf77eb23300783b9bc396203ac4369`
+- `interaction_id`: `int_164102eccbc4f239601ec1706b6e8d8a`
+- 目标对象：`supply_ontology_hand_forecast`
+- 查询产品：`U00-000080`
+- 命中实例：`id=0000023181`，数量 `3000`，截止日 `2026-05-31`，状态 `正常`
+- Interaction：`completed`，`evidence_status=complete`
+
+此前内置连接器的一次查询返回旧/公共资源，属于连接器环境路由问题，不属于 POC 数据问题。客户/生态环境验收时必须先核对 Agent 实际使用的知识网络 ID、Catalog/Resource 绑定和环境路由；若返回旧资源，应先停止业务测试并修正路由。
+
+本次只验证了预测单事实。是否可交付仍需继续执行 S1 履约证据链：成品库存、BOM 主料、物料库存、采购/生产计划和交期；“不启用替代料”必须作为明确输入。
