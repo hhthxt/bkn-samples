@@ -8,6 +8,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--engine", choices=("postgres", "mysql"), default="postgres")
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     sql = Path(__file__).resolve().parents[1] / "datasets" / args.engine / "001_action_datasets.sql"
     print(f"DDL: {sql}")

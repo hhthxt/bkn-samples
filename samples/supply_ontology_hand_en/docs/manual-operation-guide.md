@@ -1,6 +1,17 @@
-# Manual Operation Guide
+# Manual Operation Guide: UI and Scripts
 
-## One-shot flow
+Manual mode combines console UI operations with scripts. It does not use Agent dialogue for the business decision.
+
+## UI operations
+
+1. Sign in to the OpenBKN console.
+2. Open “Domain Knowledge Networks → Knowledge Network Management”.
+3. Use “Import” to upload `kn/supply_ontology_hand_en.json`.
+4. Check the network name, object types, relation types, metrics, and Actions.
+5. Select the matching resources and bind the object types in the data-resource screen.
+6. Confirm that the network is queryable before running the scripts.
+
+## Script operations
 
 ```bash
 cd tools
@@ -11,6 +22,8 @@ python3 verify_sample.py --config config.yaml --kn-id supply_ontology_hand_en
 ```
 
 Then follow the Action Dataset, Skill registration, and function-service instructions. Run every write command with `--dry-run` first.
+
+Record UI screenshots, environment-specific resource IDs, and operation timestamps in the verification report; do not write environment-specific IDs back into the portable KN JSON.
 
 ## Fulfillment question
 

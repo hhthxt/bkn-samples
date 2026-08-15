@@ -1,8 +1,29 @@
-# Agent 操作手册
+# Agent 操作手册：API、CLI 与脚本模式
 
 ## 目标
 
-通过 Agent 完成一次性导入、绑定、能力验证和供应承诺判断。
+Agent 不依赖网页界面，通过 OpenBKN API、`openbkn` CLI 和 sample 脚本完成一次性导入、绑定、能力验证和供应承诺判断。
+
+## 操作入口
+
+```text
+Agent → OpenBKN API / openbkn CLI → KN、Resource、Skill、Function、Action → 测试集与报告
+```
+
+推荐入口顺序：
+
+```bash
+openbkn auth status
+openbkn bkn validate kn/supply_ontology_hand.json
+python3 tools/load_sample_data.py --config tools/config.yaml
+python3 tools/import_kn.py --kn-file kn/supply_ontology_hand.json
+python3 tools/bind_kn_resources.py --config tools/config.yaml --kn-id supply_ontology_hand
+python3 tools/register_skills.py --dry-run
+python3 tools/setup_action_datasets.py --engine postgres
+python3 tools/bind_action_datasets.py --mapping tools/mapping/action_dataset_map.yaml
+```
+
+所有平台写入先用 dry-run；Agent 只能在平台返回能力和证据后继续，不得猜测对象类、字段、Skill 或 Action。
 
 ## 推荐用户问题
 

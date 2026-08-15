@@ -9,6 +9,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--mapping", default="mapping/action_dataset_map.yaml")
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     mapping = Path(__file__).resolve().parent / args.mapping
     print(json.dumps({"mapping": str(mapping), "mode": "apply" if args.apply else "dry-run"}, indent=2))
