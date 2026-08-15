@@ -1,7 +1,7 @@
 # 供应链本体 Sample：POC 发布验证基线
 
-日期：2026-08-15  
-目标平台：`https://poc.openbkn.ai`  
+日期：2026-08-15
+目标平台：`https://poc.openbkn.ai`
 知识网络：`supply_ontology_hand`
 
 ## 发布结论
@@ -23,6 +23,7 @@
 | Q1–Q4 基础问答 | 受管 Context Loader Interaction：成品 30、`382-000005` 订单 40、三成品仓可用 534；未验证 UI 内置 Agent 对话 | 通过 |
 | 预测金标 | 全量 115922；未关闭 90 张、56340 件 | 通过 |
 | Skill 注册 | 同一受管 Context Loader Interaction 中，以严格对象类 ID `skills` 召回 S1/S2/S3 | 通过，`evidence_status=complete` |
+| 原生 Function Runtime | `open_forecast_count` 最小调用：普通与 zlib+base64 压缩上下文均返回 `open_count=1`、`exit_code=0` | 通过（Runtime smoke） |
 
 ## 第三方可体验范围
 

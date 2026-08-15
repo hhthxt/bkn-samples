@@ -10,7 +10,7 @@
     "data_layer": "pass",
     "agent_basics": "pass",
     "skill_discovery": "pass",
-    "function_online_story": "blocked_by_toolbox_backend_dns",
+    "function_online_story": "native_runtime_smoke_pass; real_s1_s2_s3_agent_story_not_released",
     "action_execution": "not_executed; dry_run_only_requires_explicit_approval"
   },
   "network": {
@@ -47,6 +47,13 @@
       "inventory": "382-000005 records returned",
       "skills": "3 published supply-chain skills recalled",
       "evidence_status": "complete"
+    },
+    "native_function_validation": {
+      "toolbox_type": "function",
+      "operation": "open_forecast_count",
+      "normal_context": {"exit_code": 0, "open_count": 1},
+      "compressed_context": {"exit_code": 0, "open_count": 1},
+      "scope": "minimal runtime smoke only; not a real S1/S2/S3 delivery decision"
     },
     "known_product_gaps": [939, 940, 941, 942]
   }
