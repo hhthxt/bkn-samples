@@ -1,5 +1,5 @@
 ---
-name: production-schedule-backward-planning
+name: production-schedule-backward-planning_supply_ontology_hand_en
 description: >
   Use when performing BOM-level production schedule backward planning (齐套倒排),
   material need-by dates, A/B delay classification, or supply-status diagnosis
