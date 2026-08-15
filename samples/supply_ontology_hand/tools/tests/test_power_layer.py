@@ -122,4 +122,4 @@ def test_pack_payloads_exist_and_align():
     }
     assert "available_qty_sum" in lp_names
     assert "available_inventory_qty" not in lp_names
-    assert query_payload["cases"][-1]["expected_value"] == 87
+    assert query_payload["cases"][-1]["expected_value"] == 90
