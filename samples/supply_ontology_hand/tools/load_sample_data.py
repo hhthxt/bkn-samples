@@ -224,7 +224,7 @@ def main(argv: list[str] | None = None) -> int:
                 "engine": "postgres",
                 "host": input("数据库 Host: ").strip(),
                 "port": int(input("端口 [5432]: ") or "5432"),
-                "database": input("数据库名 [supply_ontology_hand_poc]: ").strip() or "supply_ontology_hand_poc",
+                "database": input("数据库名（必填）: ").strip(),
                 "user": input("用户名: ").strip(),
                 "password": getpass.getpass("密码（输入时不显示）: "),
             },
@@ -240,6 +240,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Config not found: {config_path}", file=sys.stderr)
             return 1
         cfg = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    if not cfg["database"]["database"]:
+        print("数据库名不能为空；请填写本环境 sample 数据库名", file=sys.stderr)
+        return 1
     mapping = yaml.safe_load(_DEFAULT_MAP.read_text(encoding="utf-8"))
     table_prefix = args.table_prefix
     if table_prefix is None:

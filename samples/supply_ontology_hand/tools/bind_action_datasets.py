@@ -95,7 +95,7 @@ def run_bind(config: dict, mapping: dict, *, dry_run: bool, run_cmd=run_cmd) -> 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--mapping", default="mapping/action_dataset_map.yaml")
-    parser.add_argument("--config", default="config.poc.yaml")
+    parser.add_argument("--config", default="config.yaml")
     parser.add_argument("--apply", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()

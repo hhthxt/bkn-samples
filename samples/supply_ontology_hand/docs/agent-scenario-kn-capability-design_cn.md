@@ -11,8 +11,6 @@
 
 # 第三方 Agent：场景驱动的供应链 KN 能力架构
 
-[English](./agent-scenario-kn-capability-design.md)
-
 > KN：`supplychain_hd0202`（HD供应链业务知识网络_v3）  
 > 日期：2026-08-01  
 > 受众：OpenClaw / Context Loader / 其他第三方 Agent 作者  

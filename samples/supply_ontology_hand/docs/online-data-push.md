@@ -90,7 +90,7 @@ Embedding 需在导入 KN 时使用 `--resolve-embedding`；数据上传和向�
 - Toolbox 名称格式错误：去掉连字符、空格和其他标点，仅保留中文、字母、数字、下划线。
 - POC API 返回连接超时：先执行 `openbkn auth status`，再执行 `openbkn toolbox list` 或 `openbkn skill list` 检查实际状态；不要盲目重复创建。
 - 函数 Toolbox 无法调用：确认服务运行后，还要从 POC 平台网络验证 Toolbox `service_url` 的 DNS 和 TCP 可达性。`host.docker.internal:8765` 不是通用公网地址；出现 `lookup host.docker.internal ... no such host` 时，改用 POC 可解析的 HTTPS/服务地址或部署到 POC 网络内。
-- Action Dataset 自动化失败：先用 `python3 tools/bootstrap_action_layer.py --dry-run` 检查映射；再确认数据库账号权限和三张 `sc_` 表，最后用 `openbkn bkn object-type get` 核对对象类 `data_source`。
+- Action Dataset 自动化失败：先用 `python3 tools/bootstrap_action_layer.py --config tools/config.yaml --dry-run` 检查映射；再确认数据库账号权限和三张 `sc_` 表，最后用 `openbkn bkn object-type get` 核对对象类 `data_source`。
 
 ## 手工模式
 
