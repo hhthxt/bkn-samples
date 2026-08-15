@@ -25,7 +25,7 @@ from .warehouse import resolve_warehouse_scope
 
 MAX_NODES = 5000
 REPORT_GRAINS = ("summary", "full_tree")
-PURCHASED_ATTRS = ("外购", "委外")
+PURCHASED_ATTRS = ("外购", "委外", "Purchased", "Outsourced")
 SUPPLY_STATUSES = (
     "sufficient",
     "anomaly",

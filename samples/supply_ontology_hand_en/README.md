@@ -10,6 +10,8 @@
 
 ## Documentation
 
+[Supply Chain Ontology Handbook HTML](./docs/handbook.html) · [Agent operation](./docs/agent-operation-guide.md) · [Manual operation](./docs/manual-operation-guide.md) · [Playbook](./docs/playbook.md) · [QA set](./docs/qa-eval-set.yaml)
+
 Canonical design is **Chinese** (this sample’s KN model and CSVs are Chinese):
 
 | Doc | Purpose |
@@ -38,8 +40,8 @@ Canonical design is **Chinese** (this sample’s KN model and CSVs are Chinese):
 ```bash
 cd tools
 python3 run_scenario.py --scenario fulfillment-commitment \
-  --product U00-000080 --forecast-id 0000023181 \
-  --demand-end 2026-05-31 --demand-qty 3000 \
+  --product U00-000080 --forecast-id 0000023181-FUTURE \
+  --demand-end 2026-10-31 --demand-qty 3000 \
   --output /tmp/fulfillment-report.json
 ```
 
@@ -87,13 +89,11 @@ supply_ontology_hand/
 
 ## Localization (current status)
 
-This sample is **Chinese-first** today:
+This is the English, one-shot delivery sample. Its business values, KN display text, manuals, test questions, and reports are in English. CSV headers, technical IDs, codes, dates, quantities, and API contracts remain stable for reproducible binding.
 
-- KN export (`kn/supply_ontology_hand.json`): network name, object type labels, and property `display_name` values are in Chinese.
-- Sample CSV data uses Chinese business text (orgs, materials, etc.).
-- Technical IDs (`supply_ontology_hand`, `supply_ontology_hand_*`) are English slugs and are stable across tooling.
+Use the future forecast cases in `docs/qa-eval-set.yaml` for benchmark validation. Forecast `0000023181` is retained only as a historical regression case.
 
-**Planned (not in this release):** After sample data is fully refreshed, add an English KN export (same `kn_id` and OT IDs, translated display fields only) and optional `config` locale switching — without changing bind/load scripts.
+The independent Chinese sample is available at `../supply_ontology_hand/`.
 
 ## Dependencies
 

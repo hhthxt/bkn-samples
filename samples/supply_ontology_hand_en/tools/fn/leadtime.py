@@ -14,6 +14,6 @@ def leadtime_days(snap: Snapshot, material_code: str) -> int:
     attr = (row.get("materialattr") or "").strip()
     purchase = _f(row.get("purchase_fixedleadtime"), 0.0)
     product = _f(row.get("product_fixedleadtime"), 0.0)
-    if attr in ("外购", "委外"):
+    if attr in ("外购", "委外", "Purchased", "Outsourced"):
         return int(purchase)
     return int(product)

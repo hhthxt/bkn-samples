@@ -63,7 +63,7 @@ def supply_status(
     lt = leadtime_days(snap, code) if code in snap.materials else 0
     days_until = (due - today).days
 
-    if attr in ("外购", "委外"):
+    if attr in ("外购", "委外", "Purchased", "Outsourced"):
         if not mrp:
             return {"material_code": code, "status": "anomaly", "supply": supply, "gross": gross}
         if has_po:
@@ -81,7 +81,7 @@ def supply_status(
             return {"material_code": code, "status": "no_po", "supply": supply, "gross": gross}
         return {"material_code": code, "status": "po_in_transit", "supply": supply, "gross": gross}
 
-    if attr == "自制":
+    if attr in ("自制", "In-house"):
         if child_short:
             return {"material_code": code, "status": "child_short", "supply": supply, "gross": gross}
         if not mrp:

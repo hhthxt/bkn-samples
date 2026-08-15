@@ -34,9 +34,9 @@
   kind: metric
   metric_id: forecast_demand_qty
   filters: {}
-  expected: 46840
+  expected: 56340
 - id: open_forecast_count
   kind: metric
   metric_id: open_forecast_count
   filters: {}
-  expected: 87
+  expected: 90

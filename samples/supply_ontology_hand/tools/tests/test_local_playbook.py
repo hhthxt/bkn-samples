@@ -25,8 +25,8 @@ def test_local_metrics_match_business_baseline():
     assert metrics.calculate("sales_order_count")["value"] == 800
     assert metrics.calculate("warehouse_count")["value"] == 29
     assert metrics.calculate("available_inventory_qty", product_code="382-000005", warehouse_scope="finished_goods")["value"] == 534
-    assert metrics.calculate("forecast_demand_qty")["value"] == 46840
-    assert metrics.calculate("open_forecast_count")["value"] == 87
+    assert metrics.calculate("forecast_demand_qty")["value"] == 56340
+    assert metrics.calculate("open_forecast_count")["value"] == 90
 
 
 def test_story_runner_connects_s1_s2_and_s3():

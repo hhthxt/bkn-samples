@@ -3,7 +3,7 @@ from pathlib import Path
 PACK = Path(__file__).resolve().parents[2]
 TOOLS = PACK / "tools"
 SAMPLE = PACK / "data"
-KN_JSON = PACK / "kn" / "supply_ontology_hand.json"
+KN_JSON = PACK / "kn" / "supply_ontology_hand_en.json"
 
 
 def test_pack_layout_exists():

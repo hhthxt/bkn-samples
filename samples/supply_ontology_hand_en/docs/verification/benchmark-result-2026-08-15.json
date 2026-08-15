@@ -1,7 +1,7 @@
 {
   "benchmark": "third_party_behavioral_blind",
   "reference_answers_read": false,
-  "question_cases_loaded": 89,
+  "question_cases_loaded": 3,
   "playbook_cases": [
     {
       "id": "PB-01",

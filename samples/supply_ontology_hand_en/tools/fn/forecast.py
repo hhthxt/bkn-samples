@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Iterable, Mapping
 from typing import Any
 
-CLOSED_STATUS = "已关闭"
+CLOSED_STATUS = "Closed"
 
 
 def open_forecast_count(
@@ -21,7 +21,7 @@ def open_forecast_count(
         code = str(row.get("material_number") or "").strip()
         if product and code != product:
             continue
-        if str(row.get("closestatus_title") or "").strip() == CLOSED_STATUS:
+        if str(row.get("closestatus_title") or "").strip() in ("已关闭", CLOSED_STATUS):
             excluded_closed += 1
             continue
         open_ids.append(str(row.get("id") or row.get("forecast_id") or "").strip())

@@ -13,11 +13,11 @@ from service_dependencies import get_snapshot_source
 from support_resolved_context import csv_resolved_context, forecast_rows_from_csv
 
 
-CLOSED = "已关闭"
+CLOSED = "Closed"
 SAMPLE_ROWS = [
-    {"id": "f-open-a", "material_number": "382-000005", "closestatus_title": "正常"},
-    {"id": "f-closed-a", "material_number": "382-000005", "closestatus_title": "已关闭"},
-    {"id": "f-open-b", "material_number": "U00-000151", "closestatus_title": "正常"},
+    {"id": "f-open-a", "material_number": "382-000005", "closestatus_title": "Normal"},
+    {"id": "f-closed-a", "material_number": "382-000005", "closestatus_title": "Closed"},
+    {"id": "f-open-b", "material_number": "U00-000151", "closestatus_title": "Normal"},
     {"id": "f-blank", "material_number": "U00-000151", "closestatus_title": ""},
 ]
 

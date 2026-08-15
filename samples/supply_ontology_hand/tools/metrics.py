@@ -98,9 +98,9 @@ class LocalMetricCalculator:
     def _forecast(self, filters: dict[str, Any]) -> list[dict[str, str]]:
         status = filters.get("status", "open")
         if status == "open":
-            rows = [row for row in self.datasets["forecast"] if _v(row, "closestatus_title") != "已关闭"]
+            rows = [row for row in self.datasets["forecast"] if _v(row, "closestatus_title") not in ("已关闭", "Closed")]
         elif status == "closed":
-            rows = [row for row in self.datasets["forecast"] if _v(row, "closestatus_title") == "已关闭"]
+            rows = [row for row in self.datasets["forecast"] if _v(row, "closestatus_title") in ("已关闭", "Closed")]
         else:
             raise ValueError(f"unknown forecast status: {status}")
         return _where(rows, "material_number", filters.get("product_code"))

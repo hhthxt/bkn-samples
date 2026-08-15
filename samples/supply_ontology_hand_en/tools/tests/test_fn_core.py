@@ -29,9 +29,13 @@ def test_warehouse_presets():
     prod = resolve_warehouse_scope("production_available")
     fg = resolve_warehouse_scope("finished_goods")
     assert len(prod) == 7
-    assert "苏州半成品仓" in prod
+    assert "Suzhou Semi-finished Goods Warehouse" in prod
     assert "昆山成品仓" not in prod
-    assert fg == ["苏州成品仓", "乌鲁木齐成品仓", "哈尔滨成品仓"]
+    assert fg == [
+        "Suzhou Finished Goods Warehouse",
+        "Urumqi Finished Goods Warehouse",
+        "Harbin Finished Goods Warehouse",
+    ]
     assert resolve_warehouse_scope("all") == []
 
 
