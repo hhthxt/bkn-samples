@@ -22,7 +22,7 @@ def parse_cli_json(raw: str) -> Any:
     """Parse openbkn --json stdout; unwrap common envelope keys."""
     data = json.loads(raw)
     if isinstance(data, dict):
-        for key in ("data", "items", "resources", "result"):
+        for key in ("data", "items", "resources", "entries", "result"):
             inner = data.get(key)
             if inner is not None:
                 return inner
