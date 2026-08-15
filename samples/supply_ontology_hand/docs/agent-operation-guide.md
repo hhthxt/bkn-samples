@@ -16,6 +16,7 @@ Agent → OpenBKN API / openbkn CLI → KN、Resource、Skill、Function、Actio
 openbkn auth status
 python3 tools/import_kn.py --json kn/supply_ontology_hand.json --dry-run
 python3 tools/load_sample_data.py --config tools/config.yaml
+python3 tools/load_sample_data.py --interactive --table-prefix hand_
 python3 tools/import_kn.py --json kn/supply_ontology_hand.json --resolve-embedding
 python3 tools/bind_kn_resources.py --config tools/config.yaml --kn-id supply_ontology_hand
 python3 tools/register_skills.py --dry-run

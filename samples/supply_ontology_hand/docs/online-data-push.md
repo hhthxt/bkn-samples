@@ -36,6 +36,14 @@ PY
 
 `create-from-csv` 只是平台提供的便捷数据流入口，不是物理 Catalog 的基本属性。若目标环境已启用该数据流，可使用它；否则应先通过数据库连接（或平台允许的数据库导入流程）创建带前缀的表，再运行 Catalog discover。
 
+本 sample 自带数据库推送脚本；交付/POC 操作者没有必要手写 INSERT：
+
+```bash
+python3 tools/load_sample_data.py --interactive --table-prefix hand_
+```
+
+脚本会提示 PostgreSQL 连接信息，密码不回显；连接测试成功后必须输入 `yes` 才开始写入，目标表名为 `hand_<原表名>`。
+
 不要把现有业务表直接覆盖。用前缀隔离本 sample：
 
 ```bash

@@ -36,6 +36,14 @@ PY
 
 `create-from-csv` is only a convenience dataflow entry point; writability is not an inherent property of a physical Catalog. If the target environment enables this dataflow, use it. Otherwise, create prefixed tables through the database connection or an approved database import flow, then run Catalog Discover.
 
+The sample includes the database push script; operators do not need to write INSERT statements:
+
+```bash
+python3 tools/load_sample_data.py --interactive --table-prefix hand_
+```
+
+The script prompts for PostgreSQL connection details and hides the password. It tests the connection first and only writes after the operator types `yes`; destination tables are named `hand_<original_table>`.
+
 Do not overwrite existing business tables. Isolate this sample with a prefix:
 
 ```bash

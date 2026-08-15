@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import getpass
 import re
 import sys
 from pathlib import Path
@@ -163,7 +164,7 @@ def _load_table(
     return count
 
 
-def load_all(engine: Engine, cfg: dict, mapping: dict) -> dict[str, int]:
+def load_all(engine: Engine, cfg: dict, mapping: dict, *, table_prefix: str = "") -> dict[str, int]:
     load_cfg = cfg["load"]
     sample_dir = Path(load_cfg["sample_dir"])
     mode = load_cfg.get("mode", "recreate")
@@ -174,7 +175,9 @@ def load_all(engine: Engine, cfg: dict, mapping: dict) -> dict[str, int]:
     for table in resolve_load_order(mapping):
         csv_path = sample_dir / f"{table}.csv"
         try:
-            report[table] = _load_table(engine, table, csv_path, mode, engine_name)
+            report[table_prefix + table] = _load_table(
+                engine, table_prefix + table, csv_path, mode, engine_name
+            )
         except Exception as exc:
             print(f"ERROR loading {table}: {exc}", file=sys.stderr)
             if on_error == "stop":
@@ -185,19 +188,48 @@ def load_all(engine: Engine, cfg: dict, mapping: dict) -> dict[str, int]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Load data/*.csv into a database")
     parser.add_argument("--config", default="config.yaml", help="Path to config YAML")
+    parser.add_argument("--interactive", action="store_true", help="Prompt for PostgreSQL connection details without saving them")
+    parser.add_argument("--table-prefix", default=None, help="Prefix for destination table names, e.g. hand_")
     args = parser.parse_args(argv)
 
-    config_path = Path(args.config)
-    if not config_path.is_file():
-        print(f"Config not found: {config_path}", file=sys.stderr)
-        return 1
-
-    cfg = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    if args.interactive:
+        cfg = {
+            "database": {
+                "engine": "postgres",
+                "host": input("Database host: ").strip(),
+                "port": int(input("Port [5432]: ") or "5432"),
+                "database": input("Database name: ").strip(),
+                "user": input("Username: ").strip(),
+                "password": getpass.getpass("Password (hidden): "),
+            },
+            "load": {
+                "sample_dir": str(_SCRIPT_DIR.parent / "data"),
+                "mode": "recreate",
+                "on_error": "stop",
+            },
+        }
+    else:
+        config_path = Path(args.config)
+        if not config_path.is_file():
+            print(f"Config not found: {config_path}", file=sys.stderr)
+            return 1
+        cfg = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     mapping = yaml.safe_load(_DEFAULT_MAP.read_text(encoding="utf-8"))
+    table_prefix = args.table_prefix
+    if table_prefix is None:
+        table_prefix = (cfg.get("load") or {}).get("table_prefix", "")
 
     try:
         engine = build_engine(cfg["database"])
-        report = load_all(engine, cfg, mapping)
+        with engine.connect():
+            pass
+        print("Database connection succeeded.")
+        if args.interactive:
+            answer = input(f"Load {len(mapping['load_order'])} tables with prefix {table_prefix!r}? Type yes to start: ").strip().lower()
+            if answer not in ("yes", "y"):
+                print("Cancelled; no data was written.")
+                return 0
+        report = load_all(engine, cfg, mapping, table_prefix=table_prefix)
     except Exception as exc:
         print(f"Load failed: {exc}", file=sys.stderr)
         if cfg.get("load", {}).get("on_error", "stop") == "stop":
