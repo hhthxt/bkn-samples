@@ -63,7 +63,7 @@ Agent mode now uses `bootstrap_action_layer.py --interactive --apply` to execute
 
 ## Q11: Why is a function Toolbox created but not callable?
 
-Keep `fn_service` running on port 8765 and verify that the OpenBKN platform container can reach `http://host.docker.internal:8765`. Local browser reachability alone is insufficient.
+Keep `fn_service` running on port 8765 and verify DNS/TCP reachability of the Toolbox `service_url` from the POC platform network. `host.docker.internal` works only when that network provides the mapping; local browser reachability alone is insufficient.
 
 ## Q12: The OpenAPI upload succeeded but the tools cannot be called
 

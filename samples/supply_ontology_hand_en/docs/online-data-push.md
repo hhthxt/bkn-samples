@@ -90,7 +90,7 @@ Resolve the target embedding with `--resolve-embedding` during KN import. Data u
 - Metric creation says `resource id is required`: bind object-type resources before registering metrics.
 - Toolbox name validation failed: remove hyphens, spaces, and punctuation; keep only Chinese characters, letters, digits, and underscores.
 - POC API request timed out: run `openbkn auth status`, then list Toolboxes or Skills to check actual state before retrying.
-- Function Toolbox cannot be called: keep the local function service running and verify that the platform container can reach `http://host.docker.internal:8765`.
+- Function Toolbox cannot be called: after confirming the service is running, verify DNS/TCP reachability of the Toolbox `service_url` from the POC platform network. `host.docker.internal:8765` is not a universal public address; use a POC-resolvable HTTPS/service address or deploy the service inside the POC network when DNS resolution fails.
 - Action Dataset automation failed: run `python3 tools/bootstrap_action_layer.py --dry-run`, confirm database permissions and the three `sc_` tables, then verify object-type `data_source` with `openbkn bkn object-type get`.
 
 ## Manual mode

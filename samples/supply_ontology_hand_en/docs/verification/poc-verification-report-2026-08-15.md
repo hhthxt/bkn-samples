@@ -88,4 +88,14 @@ The supplemental POC step is now complete: Resource ID `da01diljdthc73bmqf10` is
 
 We then read S1 through the POC Context Loader and attempted to validate the `execute_skill` contract. The platform requires `entry_shell` to be explicitly declared by `SKILL.md`; S1 currently declares that the Toolbox `backward_plan` should be preferred, but declares no `entry_shell`. The managed Interaction was therefore closed as `failed`. No offline CLI fallback, fabricated entry, or business Action was executed.
 
-This exposes a delivery issue that must be resolved before customer acceptance: S1 is an orchestration Skill (`Context Loader evidence → Toolbox function → report`), while the current `execute_skill` interface has no business-input parameters and the Context Loader catalog has no Toolbox-call tool. Until the platform defines the adapter for this class of Skill, only `find_skills` is passed; the S1 online execution loop is not yet passed.
+This is an execution-entry distinction, not a lack of function support: the POC function Toolbox is published and `backward_plan` is enabled. `execute_skill` is for Skills with an explicit `entry_shell`; the Context Loader MCP catalog is separate from the Toolbox catalog. S1 should be orchestrated by the third-party Agent, which submits `resolved_context` and business parameters through the OpenBKN Toolbox Tool interface.
+
+## Function Toolbox online-call result
+
+We followed the correct path and attempted a real call in one managed Interaction. The Agent assembled `forecast=1`, `bom=5`, `material=6`, `inventory=15`, `purchase_order=6`, `purchase_request=28`, and `mrp=8` rows, then invoked the enabled `backward_plan` tool. The call did not enter function execution because the POC platform returned:
+
+```text
+dial tcp: lookup host.docker.internal on 10.96.0.10:53: no such host
+```
+
+Conclusion: the function Toolbox, request contract, and Agent orchestration path are wired correctly; the current blocker is that the function service URL cannot be resolved from the POC platform container. Configure the Toolbox with a POC-reachable HTTPS/service address or deploy the function service into a network reachable by POC. Local reachability of `host.docker.internal` is not evidence of POC reachability.

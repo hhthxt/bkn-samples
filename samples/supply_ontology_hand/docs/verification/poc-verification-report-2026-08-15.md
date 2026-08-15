@@ -105,3 +105,13 @@ POC 已完成该补充步骤：`public.skills` Resource ID 为 `da01diljdthc73bm
 随后按 POC Context Loader 的 `execute_skill` 契约读取 S1 内容并尝试执行。平台要求 `entry_shell` 必须来自 `SKILL.md` 明确声明的入口；当前 S1 只声明“优先调用 Toolbox `backward_plan`”，没有声明 `entry_shell`，因此平台拒绝进入执行阶段。本轮已按受管协议以 `failed` 结束，未调用离线 CLI、未伪造入口、未执行任何业务 Action。
 
 这暴露的是 Skill 执行入口选择问题，不是函数 Toolbox 不支持调用：POC 函数 Toolbox 已发布，`backward_plan` 工具已启用；当前 `execute_skill` 只适合带 `entry_shell` 的脚本型 Skill，而 Context Loader 的 MCP 工具目录不等于 Toolbox 工具目录。编排型 S1 应由第三方 Agent 读取 Skill 契约后，通过 OpenBKN Toolbox Tool 接口提交 `resolved_context` 和业务参数。待按该路径完成一次真实 POC 函数调用后，再单独关闭 S1 在线闭环验证。
+
+## 函数 Toolbox 在线调用结果
+
+已按正确路径完成一次真实调用尝试：同一受管 Interaction 中查询并组装了 `forecast=1`、`bom=5`、`material=6`、`inventory=15`、`purchase_order=6`、`purchase_request=28`、`mrp=8` 行，然后调用已启用的 `backward_plan` 工具。调用未进入函数计算，平台返回：
+
+```text
+dial tcp: lookup host.docker.internal on 10.96.0.10:53: no such host
+```
+
+结论：函数 Toolbox、请求合同和 Agent 编排路径均已走通；当前阻塞是函数服务地址对 POC 平台容器不可解析。需要把 Toolbox 的 `service_url` 改为 POC 网络可解析、可访问的 HTTPS/服务地址，或将函数服务部署到 POC 可访问的运行环境。不能把 `host.docker.internal` 在本地可用等同于 POC 平台可用。
