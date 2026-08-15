@@ -49,7 +49,7 @@ find_skills / get_skill_content
 → propose an Action when needed and wait for human approval
 ```
 
-The Skill does not query, the function does not query, and the Agent must not recalculate outside the snapshot or fabricate evidence. If the POC does not expose a managed Toolbox call, validate only Skill recall and the local orchestration contract; do not claim that the online Skill execution loop has passed.
+The Skill does not query, the function does not query, and the Agent must not recalculate outside the snapshot or fabricate evidence. The function Toolbox is callable; do not confuse the Context Loader MCP catalog with the Toolbox catalog. S1 should submit `resolved_context` and business parameters through the OpenBKN Toolbox Tool interface, while `execute_skill` is reserved for script-based Skills.
 
 ## `resolved_context` 形状
 

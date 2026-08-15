@@ -77,6 +77,6 @@ Context Loader(bkn_context)
 → Agent report
 ```
 
-如果当前 POC 的 Context Loader 尚未提供受管 Toolbox 调用入口，先完成本地契约验证并将在线执行标记为待平台能力补齐；不得改用 CSV、离线 CLI 或无 Trace 的直连调用冒充在线通过。
+POC 的函数 Toolbox 已支持调用；Context Loader MCP 工具目录与 Toolbox 工具目录是两套目录。Agent 应通过 OpenBKN Toolbox Tool 接口提交上面的请求；不得改用 CSV、离线 CLI 或无 Trace 的直连调用冒充在线通过。
 
 完整对话样例见 [Playbook](playbook.md)。

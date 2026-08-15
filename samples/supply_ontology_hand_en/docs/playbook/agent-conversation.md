@@ -101,7 +101,7 @@ Skill contract
 → Agent report
 ```
 
-If a managed Toolbox call is unavailable, report that the platform execution adapter is incomplete; do not substitute an offline CLI result for online evidence.
+The function Toolbox is callable; the Agent should submit `resolved_context` through the OpenBKN Toolbox Tool interface and must not substitute an offline CLI result for online evidence.
 
 - 缺少产品、预测单、数量、截止日或替代策略时先追问，不猜测；
 - 不把 S1 的风险直接改写成客户承诺；

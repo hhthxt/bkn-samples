@@ -77,4 +77,4 @@ Context Loader(bkn_context)
 → Agent report
 ```
 
-If the POC Context Loader does not yet expose a managed Toolbox call, complete the local contract validation and mark online execution as pending platform support. Do not use CSV, offline CLI, or an untraced direct call as a substitute for online success.
+The POC function Toolbox is callable; the Context Loader MCP catalog and the Toolbox catalog are separate. The Agent should submit the request above through the OpenBKN Toolbox Tool interface. Do not use CSV, offline CLI, or an untraced direct call as a substitute for online success.

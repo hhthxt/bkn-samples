@@ -49,7 +49,7 @@ find_skills / get_skill_content
 → 有需要时提出 Action，等待人工确认
 ```
 
-Skill 不自行查询、函数不自行查询，Agent 不得脱离快照重算或伪造证据。当前 POC 若未提供受管 Toolbox 调用入口，只能验证 Skill 召回和本地编排契约，不能宣称线上 Skill 执行闭环通过。
+Skill 不自行查询、函数不自行查询，Agent 不得脱离快照重算或伪造证据。函数 Toolbox 已支持调用；不要把 Context Loader 的 MCP 工具列表当作 Toolbox 工具列表。S1 应通过 OpenBKN Toolbox Tool 接口提交 `resolved_context` 和业务参数，`execute_skill` 仅用于脚本型 Skill。
 
 ## `resolved_context` 形状
 

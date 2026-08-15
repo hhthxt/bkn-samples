@@ -101,7 +101,7 @@ Skill contract
 → Agent report
 ```
 
-缺少受管 Toolbox 调用入口时，必须明确报告“平台执行适配未完成”，不得用离线 CLI 结果替代线上证据。
+函数 Toolbox 已支持调用；Agent 应通过 OpenBKN Toolbox Tool 接口提交 `resolved_context`，不得用离线 CLI 结果替代线上证据。
 
 - 缺少产品、预测单、数量、截止日或替代策略时先追问，不猜测；
 - 不把 S1 的风险直接改写成客户承诺；

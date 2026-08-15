@@ -20,6 +20,7 @@ No real purchase, monitor-task creation, or monitor-task close was executed in t
 | Catalog ID | `d9vuoqtjdthc73bmpprg` |
 | Action Toolbox | `af2ad8cb-9c32-4c07-aea8-fc05161d12e7`, published |
 | Toolbox tools | 13/13 enabled |
+| Function Toolbox | Published; `backward_plan` tool `91565dd5-7df6-4d94-8e7a-2172488b6de5`, enabled |
 
 After Catalog Discover, the Action Dataset Resources were:
 

@@ -20,6 +20,7 @@ POC 的数据导入、物理 Catalog、对象类绑定、Action Dataset 建表�
 | Catalog ID | `d9vuoqtjdthc73bmpprg` |
 | Action Toolbox | `af2ad8cb-9c32-4c07-aea8-fc05161d12e7`，published |
 | Toolbox 工具 | 13/13 enabled |
+| 函数 Toolbox | 已发布；`backward_plan` 工具 `91565dd5-7df6-4d94-8e7a-2172488b6de5`，enabled |
 | Skill | S1、S2、S3 已发布；S1 使用 POC 专用名称避免同名冲突 |
 
 ## Action Dataset 验证
@@ -103,4 +104,4 @@ POC 已完成该补充步骤：`public.skills` Resource ID 为 `da01diljdthc73bm
 
 随后按 POC Context Loader 的 `execute_skill` 契约读取 S1 内容并尝试执行。平台要求 `entry_shell` 必须来自 `SKILL.md` 明确声明的入口；当前 S1 只声明“优先调用 Toolbox `backward_plan`”，没有声明 `entry_shell`，因此平台拒绝进入执行阶段。本轮已按受管协议以 `failed` 结束，未调用离线 CLI、未伪造入口、未执行任何业务 Action。
 
-这暴露出一个交付前必须解决的接口问题：S1 是“Context Loader 取证 → Toolbox 函数调用 → 报告”的编排型 Skill，当前 `execute_skill` 接口没有业务输入参数，也没有 Context Loader 内的 Toolbox 调用工具。客户验收前必须由平台侧明确该类 Skill 的执行适配方式，或为 Skill 提供可声明且可传入业务参数的入口；在此之前只能把 `find_skills` 记为通过，不能把 S1 的平台执行闭环记为通过。
+这暴露的是 Skill 执行入口选择问题，不是函数 Toolbox 不支持调用：POC 函数 Toolbox 已发布，`backward_plan` 工具已启用；当前 `execute_skill` 只适合带 `entry_shell` 的脚本型 Skill，而 Context Loader 的 MCP 工具目录不等于 Toolbox 工具目录。编排型 S1 应由第三方 Agent 读取 Skill 契约后，通过 OpenBKN Toolbox Tool 接口提交 `resolved_context` 和业务参数。待按该路径完成一次真实 POC 函数调用后，再单独关闭 S1 在线闭环验证。
