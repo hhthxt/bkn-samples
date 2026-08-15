@@ -82,3 +82,9 @@ During `find_skills` validation, the POC object class `skills` was found with a 
 4. Matching English/Chinese tests and Agent/manual documentation
 
 The supplemental POC step is now complete: Resource ID `da01diljdthc73bmqf10` is bound to object class `skills`, with `object_type_ids`, `skill_query`, and the other physical mappings exposed. A traceable Context Loader Interaction successfully recalled three published Skills: S1, S2, and S3. Skill Registry is now counted as passed for the POC.
+
+## Skill executable-contract check
+
+We then read S1 through the POC Context Loader and attempted to validate the `execute_skill` contract. The platform requires `entry_shell` to be explicitly declared by `SKILL.md`; S1 currently declares that the Toolbox `backward_plan` should be preferred, but declares no `entry_shell`. The managed Interaction was therefore closed as `failed`. No offline CLI fallback, fabricated entry, or business Action was executed.
+
+This exposes a delivery issue that must be resolved before customer acceptance: S1 is an orchestration Skill (`Context Loader evidence → Toolbox function → report`), while the current `execute_skill` interface has no business-input parameters and the Context Loader catalog has no Toolbox-call tool. Until the platform defines the adapter for this class of Skill, only `find_skills` is passed; the S1 online execution loop is not yet passed.

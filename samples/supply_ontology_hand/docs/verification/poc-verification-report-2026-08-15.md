@@ -98,3 +98,9 @@ S1 结论：**不能证明按 2026-05-31 交付 3000 台；当前证据应判定
 4. 中英文测试与 Agent/手工手册说明
 
 POC 已完成该补充步骤：`public.skills` Resource ID 为 `da01diljdthc73bmqf10`，对象类 `skills` 已绑定并补齐 `object_type_ids` / `skill_query` 等物理映射。通过可追踪 Context Loader Interaction 成功召回 3 个已发布 Skill：S1、S2、S3。Skill Registry 现计入 POC 通过项。
+
+## Skill 可执行契约检查
+
+随后按 POC Context Loader 的 `execute_skill` 契约读取 S1 内容并尝试执行。平台要求 `entry_shell` 必须来自 `SKILL.md` 明确声明的入口；当前 S1 只声明“优先调用 Toolbox `backward_plan`”，没有声明 `entry_shell`，因此平台拒绝进入执行阶段。本轮已按受管协议以 `failed` 结束，未调用离线 CLI、未伪造入口、未执行任何业务 Action。
+
+这暴露出一个交付前必须解决的接口问题：S1 是“Context Loader 取证 → Toolbox 函数调用 → 报告”的编排型 Skill，当前 `execute_skill` 接口没有业务输入参数，也没有 Context Loader 内的 Toolbox 调用工具。客户验收前必须由平台侧明确该类 Skill 的执行适配方式，或为 Skill 提供可声明且可传入业务参数的入口；在此之前只能把 `find_skills` 记为通过，不能把 S1 的平台执行闭环记为通过。
