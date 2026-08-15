@@ -33,6 +33,14 @@ python3 tools/setup_action_datasets.py --engine postgres
 python3 tools/bind_action_datasets.py --mapping tools/mapping/action_dataset_map.yaml
 ```
 
+### 平台写入前的实施约束
+
+- Toolbox 名称只能包含中文、英文字母、数字和下划线；不要使用 `-`、空格或其他标点。例如使用 `供应链计算函数工具箱P0`，不要使用 `供应链计算函数工具箱-P0`。
+- 每次创建前先用 `openbkn toolbox list` 按名称确认是否已经存在。若命令出现连接超时，不要立即重复创建；先执行 `openbkn auth status`，再查询列表确认平台是否已创建成功。
+- 函数服务必须先启动并保持运行，服务地址使用 `http://host.docker.internal:8765`；OpenBKN 平台能访问该地址，不等于本机浏览器能访问该地址。
+- Action Dataset 的 DDL 必须由操作者用数据库连接执行；`setup_action_datasets.py --dry-run` 只打印 SQL，未确认前不使用真实库。
+- `bind_action_datasets.py` 和 `register_skills.py` 当前先输出绑定/注册计划；看到 `mode=apply` 不代表已经完成平台写入，必须再用 `openbkn` 查询结果验收。
+
 所有平台写入先用 dry-run；Agent 只能在平台返回能力和证据后继续，不得猜测对象类、字段、Skill 或 Action。
 
 ## 推荐用户问题

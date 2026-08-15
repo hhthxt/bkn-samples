@@ -48,3 +48,19 @@ openbkn --json bkn metric list <kn_id>
 ## Q7：手工模式怎么处理？
 
 在 UI 的模型/索引配置中选择当前环境可用的 embedding，再导入 JSON。原则与 Agent 模式相同：不能照抄其他环境的 model ID。
+
+## Q8：为什么 Toolbox 创建提示名称格式错误？
+
+POC 的 Toolbox 名称只允许中文、英文字母、数字和下划线。不要使用连字符、空格或括号，例如使用 `供应链计算函数工具箱P0`。
+
+## Q9：POC API 连接超时后能不能直接重试创建？
+
+不能直接盲目重试。先执行 `openbkn auth status`，再执行 `openbkn toolbox list --limit 100` 确认同名 Toolbox 是否已经创建。
+
+## Q10：`setup_action_datasets.py --apply` 是否已经把表建到数据库？
+
+当前脚本的 `--dry-run` 只输出 DDL，`--apply` 仍是保护性占位，不能当作建表成功证明。必须由操作者使用数据库客户端执行 `datasets/postgres/001_action_datasets.sql`，再查询三张 `sc_` 表确认。
+
+## Q11：函数 Toolbox 创建成功但调用失败怎么办？
+
+保持 `fn_service` 进程运行，确认服务监听 8765 端口，并确认 OpenBKN 运行环境能够访问 `http://host.docker.internal:8765`。本机能打开服务地址，不代表平台容器一定能访问。

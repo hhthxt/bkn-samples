@@ -48,3 +48,19 @@ Skill registration, function services, and action bindings must also be verified
 ## Q7: How does Manual mode handle this?
 
 Select an embedding available in the target environment in the UI before importing the JSON. The rule is the same as Agent mode: do not reuse a model ID from another environment.
+
+## Q8: Why does Toolbox creation reject the name?
+
+The POC accepts only Chinese characters, letters, digits, and underscores in Toolbox names. Remove hyphens, spaces, and punctuation.
+
+## Q9: What should I do after a POC API timeout?
+
+Do not blindly retry creation. Run `openbkn auth status`, then list Toolboxes and confirm whether the requested name already exists before retrying.
+
+## Q10: Does `setup_action_datasets.py --apply` create the tables?
+
+Not currently. The script is a protected placeholder; the operator must execute `datasets/postgres/001_action_datasets.sql` with a database client and verify the three `sc_` tables.
+
+## Q11: Why is a function Toolbox created but not callable?
+
+Keep `fn_service` running on port 8765 and verify that the OpenBKN platform container can reach `http://host.docker.internal:8765`. Local browser reachability alone is insufficient.

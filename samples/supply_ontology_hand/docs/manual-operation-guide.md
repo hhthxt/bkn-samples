@@ -34,6 +34,18 @@ python3 verify_sample.py --config config.poc.yaml --kn-id supply_ontology_hand
 
 再按 `tools/setup_action_datasets.py`、Skill 注册和函数服务说明完成动力层配置。所有写入命令先使用 `--dry-run`，确认资源和影响范围后再执行。
 
+### 函数 Toolbox 与超时处理
+
+函数服务启动后，Toolbox 名称只能使用中文、字母、数字和下划线，不能含连字符、空格或其他标点。创建前先在 UI 或 `openbkn toolbox list` 中确认同名 Toolbox；如果 POC 返回连接超时，先检查 `openbkn auth status` 和 Toolbox 列表，再决定是否重试，避免重复创建。
+
+函数服务地址为 `http://host.docker.internal:8765`。服务进程必须持续运行，不能在上传 OpenAPI 后立即关闭。
+
+### Action Dataset 建表
+
+Action Dataset 不是导入 KN JSON 自动生成的。操作者必须把
+`datasets/postgres/001_action_datasets.sql` 手工执行到本 sample 专用数据库；执行前先备份或确认目标库，执行后核对三张表：
+`sc_pr_decision`、`sc_plan_monitor_task`、`sc_plan_monitor_item`。
+
 人工模式的界面截图、资源 ID 和操作时间应记录在本次验证报告中；不得把环境特定 ID 写回可移植 KN JSON。
 
 ## 供应承诺问题

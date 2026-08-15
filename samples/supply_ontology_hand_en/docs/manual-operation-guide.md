@@ -34,6 +34,16 @@ python3 verify_sample.py --config config.poc.yaml --kn-id supply_ontology_hand_e
 
 Then follow the Action Dataset, Skill registration, and function-service instructions. Run every write command with `--dry-run` first.
 
+### Function Toolbox and timeout handling
+
+Toolbox names may contain only Chinese characters, letters, digits, and underscores. Do not use hyphens, spaces, or other punctuation. Check for an existing Toolbox before creating one; after a POC timeout, check `openbkn auth status` and the Toolbox list before retrying.
+
+Keep the function service running at `http://host.docker.internal:8765`; uploading the OpenAPI document does not work if the service is stopped afterward.
+
+### Action Dataset tables
+
+Action Datasets are not created by importing the KN JSON. The operator must execute `datasets/postgres/001_action_datasets.sql` against the dedicated sample database and verify `sc_pr_decision`, `sc_plan_monitor_task`, and `sc_plan_monitor_item` afterward.
+
 Record UI screenshots, environment-specific resource IDs, and operation timestamps in the verification report; do not write environment-specific IDs back into the portable KN JSON.
 
 ## Fulfillment question

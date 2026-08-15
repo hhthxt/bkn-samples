@@ -84,6 +84,10 @@ Resolve the target embedding with `--resolve-embedding` during KN import. Data u
 - `Invalid Record Length`: a CSV row has a different number of columns from the header. Run the shape check first; do not blindly retry because partial tables may remain.
 - Resource exists but binding fails: verify the resource belongs to the target Catalog, the `hand_` prefix is present, and the object type uses the current environment resource ID.
 - Metric creation says `resource id is required`: bind object-type resources before registering metrics.
+- Toolbox name validation failed: remove hyphens, spaces, and punctuation; keep only Chinese characters, letters, digits, and underscores.
+- POC API request timed out: run `openbkn auth status`, then list Toolboxes or Skills to check actual state before retrying.
+- Function Toolbox cannot be called: keep the local function service running and verify that the platform container can reach `http://host.docker.internal:8765`.
+- Action Dataset binding has no effect: execute the SQL in the target database and verify the three `sc_` tables; `mode=apply` output alone is not platform evidence.
 
 ## Manual mode
 
