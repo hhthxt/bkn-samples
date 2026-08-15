@@ -41,10 +41,10 @@ PY
 本 sample 自带数据库推送脚本；交付/POC 操作者没有必要手写 INSERT：
 
 ```bash
-python3 tools/load_sample_data.py --interactive --table-prefix hand_
+python3 tools/load_sample_data.py --interactive --create-database --table-prefix hand_
 ```
 
-脚本会提示 PostgreSQL 连接信息，密码不回显；连接测试成功后必须输入 `yes` 才开始写入，目标表名为 `hand_<原表名>`。
+脚本会先使用 `postgres` 维护库创建目标数据库（若不存在），再提示连接信息；密码不回显，连接测试成功后必须输入 `yes` 才开始写入，目标表名为 `hand_<原表名>`。若数据库账号没有 `CREATEDB` 权限，应由 DBA 先建库，再去掉 `--create-database` 重试。
 
 数据库表导入后，使用同一组连接信息创建独立物理 Catalog：
 

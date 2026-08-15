@@ -41,10 +41,10 @@ PY
 The sample includes the database push script; operators do not need to write INSERT statements:
 
 ```bash
-python3 tools/load_sample_data.py --interactive --table-prefix hand_
+python3 tools/load_sample_data.py --interactive --create-database --table-prefix hand_
 ```
 
-The script prompts for PostgreSQL connection details and hides the password. It tests the connection first and only writes after the operator types `yes`; destination tables are named `hand_<original_table>`.
+The script first creates the target database through the `postgres` maintenance database if it does not exist, then prompts for connection details. The password is hidden; it tests the connection and writes only after `yes`; destination tables are named `hand_<original_table>`. If the account lacks `CREATEDB`, ask a DBA to create the database and rerun without `--create-database`.
 
 After loading the tables, use the same connection details to create the dedicated physical Catalog:
 

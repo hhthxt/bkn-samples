@@ -4,6 +4,7 @@ import argparse
 import csv
 import getpass
 import re
+import re
 import sys
 from pathlib import Path
 from typing import Iterable
@@ -11,6 +12,8 @@ from typing import Iterable
 import yaml
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
+import psycopg
+from psycopg import sql as psycopg_sql
 
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}")
 _SAMPLE_ROWS = 200
@@ -88,6 +91,24 @@ def build_engine(db: dict) -> Engine:
     else:
         raise ValueError(f"unsupported engine: {eng}")
     return create_engine(url)
+
+
+def ensure_postgres_database(db: dict) -> None:
+    name = str(db["database"])
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+        raise ValueError("database name must contain only letters, digits, and underscores")
+    maintenance = dict(db)
+    maintenance["database"] = "postgres"
+    conn = psycopg.connect(host=maintenance["host"], port=maintenance["port"], dbname="postgres", user=maintenance["user"], password=maintenance["password"], autocommit=True)
+    try:
+        exists = conn.execute("select 1 from pg_database where datname = %s", (name,)).fetchone()
+        if not exists:
+            conn.execute(psycopg_sql.SQL("CREATE DATABASE {}").format(psycopg_sql.Identifier(name)))
+            print(f"Created database: {name}")
+        else:
+            print(f"Database already exists: {name}")
+    finally:
+        conn.close()
 
 
 def _infer_schema(header: list[str], rows: list[list[str]], engine_name: str) -> list[tuple[str, str]]:
@@ -190,6 +211,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--config", default="config.yaml", help="Path to config YAML")
     parser.add_argument("--interactive", action="store_true", help="Prompt for PostgreSQL connection details without saving them")
     parser.add_argument("--table-prefix", default=None, help="Prefix for destination table names, e.g. hand_")
+    parser.add_argument("--create-database", action="store_true", help="Create the target PostgreSQL database using the postgres maintenance database")
     args = parser.parse_args(argv)
 
     if args.interactive:
@@ -221,6 +243,9 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         engine = build_engine(cfg["database"])
+        if args.create_database:
+            ensure_postgres_database(cfg["database"])
+            engine = build_engine(cfg["database"])
         with engine.connect():
             pass
         print("Database connection succeeded.")

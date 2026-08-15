@@ -7,7 +7,7 @@ Manual mode combines console UI operations with scripts. It does not use Agent d
 Database-table import is a required online prerequisite. The operator must perform it with database credentials; importing the KN JSON in the OpenBKN UI alone is not sufficient:
 
 ```bash
-python3 tools/load_sample_data.py --interactive --table-prefix hand_
+python3 tools/load_sample_data.py --interactive --create-database --table-prefix hand_
 ```
 
 Enter the PostgreSQL host, port, database, username, and password. After the connection test succeeds, type `yes`; the script creates `hand_`-prefixed tables and preserves existing business tables.

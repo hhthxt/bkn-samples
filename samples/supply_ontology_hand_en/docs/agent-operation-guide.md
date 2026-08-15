@@ -9,7 +9,7 @@ The Agent does not depend on the web UI. It uses OpenBKN APIs, the `openbkn` CLI
 This step must be performed by the deployment/POC operator because it requires database connection details and a password. From the sample root, run:
 
 ```bash
-python3 tools/load_sample_data.py --interactive --table-prefix hand_
+python3 tools/load_sample_data.py --interactive --create-database --table-prefix hand_
 ```
 
 Enter the PostgreSQL host, port, database, username, and password. The script tests the connection and writes only after you type `yes`; destination tables use the `hand_` prefix. Agent automation starts after Catalog Discover.
