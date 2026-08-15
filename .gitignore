@@ -5,3 +5,7 @@
 **/smoke_report.json
 .venv/
 .DS_Store
+
+# Local implementation working papers are not public Sample deliverables.
+/docs/plans/
+/samples/*/docs/plans/
