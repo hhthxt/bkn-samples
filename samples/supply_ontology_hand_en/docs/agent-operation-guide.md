@@ -38,6 +38,7 @@ python3 tools/bind_action_datasets.py --mapping tools/mapping/action_dataset_map
 - Toolbox names may contain only Chinese characters, letters, digits, and underscores. Do not use hyphens, spaces, or other punctuation; use `SupplyChainFunctionToolsP0`, not `SupplyChainFunctionTools-P0`.
 - Before creating a Toolbox, check `openbkn toolbox list` by name. If the POC request times out, run `openbkn auth status` and list Toolboxes before retrying, so a successful create is not duplicated.
 - Keep the function service running at `http://host.docker.internal:8765`. Reachability from the local browser does not prove reachability from the OpenBKN platform container.
+- Tools uploaded from OpenAPI may default to `disabled`; capture the returned `tool_id` values, run `openbkn tool enable --toolbox <box-id> <tool-id...>`, and verify that every tool is `enabled`.
 - Action Dataset DDL must be executed by the operator using the database connection. `setup_action_datasets.py --dry-run` only prints SQL.
 - The current `bind_action_datasets.py` and `register_skills.py` scripts print plans first; a `mode=apply` line is not platform evidence. Verify with OpenBKN queries afterward.
 

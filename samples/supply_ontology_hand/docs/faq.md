@@ -64,3 +64,7 @@ POC 的 Toolbox 名称只允许中文、英文字母、数字和下划线。不�
 ## Q11：函数 Toolbox 创建成功但调用失败怎么办？
 
 保持 `fn_service` 进程运行，确认服务监听 8765 端口，并确认 OpenBKN 运行环境能够访问 `http://host.docker.internal:8765`。本机能打开服务地址，不代表平台容器一定能访问。
+
+## Q12：OpenAPI 上传成功但工具不能调用怎么办？
+
+上传成功不等于工具已启用。检查 Toolbox 中每个工具的状态；如果是 `disabled`，使用上传回执中的 `tool_id` 执行 `openbkn tool enable`，再重新查询确认。

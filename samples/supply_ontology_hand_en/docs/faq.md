@@ -64,3 +64,7 @@ Not currently. The script is a protected placeholder; the operator must execute 
 ## Q11: Why is a function Toolbox created but not callable?
 
 Keep `fn_service` running on port 8765 and verify that the OpenBKN platform container can reach `http://host.docker.internal:8765`. Local browser reachability alone is insufficient.
+
+## Q12: The OpenAPI upload succeeded but the tools cannot be called
+
+Upload success does not mean the tools are enabled. Check each tool status in the Toolbox, enable any `disabled` tool with its returned `tool_id`, and verify again.
