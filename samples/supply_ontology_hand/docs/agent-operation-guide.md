@@ -29,6 +29,9 @@ python3 tools/setup_catalog.py --interactive --table-prefix hand_ --write-config
 python3 tools/import_kn.py --json kn/supply_ontology_hand.json --resolve-embedding
 python3 tools/bind_kn_resources.py --config tools/config.poc.yaml --kn-id supply_ontology_hand --table-prefix hand_
 python3 tools/register_skills.py --dry-run
+python3 tools/setup_skill_dataset.py --interactive --apply --kn-id supply_ontology_hand
+openbkn --json vega catalog discover <catalog-id> --wait
+python3 tools/bind_skill_dataset.py --kn-id supply_ontology_hand --catalog-id <catalog-id> --apply
 python3 tools/bootstrap_action_layer.py \
   --config tools/config.poc.yaml \
   --interactive --apply
@@ -41,6 +44,7 @@ python3 tools/bootstrap_action_layer.py \
 - 函数服务必须先启动并保持运行，服务地址使用 `http://host.docker.internal:8765`；OpenBKN 平台能访问该地址，不等于本机浏览器能访问该地址。
 - OpenAPI 上传后工具默认可能是 `disabled`；必须记录返回的 `tool_id`，执行 `openbkn tool enable --toolbox <box-id> <tool-id...>`，再查询 Toolbox 确认全部为 `enabled`。
 - Agent 模式由 `bootstrap_action_layer.py` 一次完成幂等建表、三张表验收和对象类绑定；密码只在本次交互中使用，不写入 `config.poc.yaml`。
+- Skill Registry 也是数据库表：先运行 `setup_skill_dataset.py` 建表并从当前环境已发布 Skill 生成/幂等更新 `public.skills`，再重新 Discover，最后用 `bind_skill_dataset.py` 将对象类 ID `skills` 绑定到 Resource。不能只注册 Skill API 而跳过 Dataset 绑定。
 - `setup_action_datasets.py --dry-run` 和 `bind_action_datasets.py --dry-run` 仍可分别检查计划；正式执行后必须再用数据库查询和 `openbkn bkn object-type get` 验收。
 
 所有平台写入先用 dry-run；Agent 只能在平台返回能力和证据后继续，不得猜测对象类、字段、Skill 或 Action。

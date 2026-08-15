@@ -14,6 +14,12 @@
 
 三张表都是决策与监控记录表：**本期不调用 ERP**，不写入、不同步、不引用 ERP 采购申请或采购订单单据号；`sc_pr_decision` 是决策记录，不是 ERP 采购申请。
 
+## 1.1 Skill Registry（Agent 召回前置表）
+
+`public.skills` 是 Context Loader `find_skills` 使用的注册表，不是 OpenBKN Skill API 的替代表。Agent 模式必须按以下顺序完成：Skill API 注册/发布 → `tools/setup_skill_dataset.py --interactive --apply` 建表并从当前环境回填已发布 Skill → Catalog Discover → `tools/bind_skill_dataset.py --apply` 将对象类 ID `skills` 绑定到 Resource。只注册 Skill API、但对象类 `skills` 的 `data_source` 为空时，`find_skills` 会失败。
+
+PostgreSQL 建表文件：`datasets/postgres/002_skill_registry.sql`。该表只保存 Skill 检索元数据，不保存凭据或 Skill 文件正文。
+
 ## 2. 安装
 
 脚本按方言分目录，文件名一致：

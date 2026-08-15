@@ -14,6 +14,12 @@
 
 三张表都是决策与监控记录表：**本期不调用 ERP**，不写入、不同步、不引用 ERP 采购申请或采购订单单据号；`sc_pr_decision` 是决策记录，不是 ERP 采购申请。
 
+## 1.1 Skill Registry (Agent recall prerequisite)
+
+`public.skills` is the Context Loader registry used by `find_skills`; it does not replace OpenBKN Skill API registration. Agent mode must run: register/publish Skills through the API → `tools/setup_skill_dataset.py --interactive --apply` to create and seed the table from the current environment → Catalog Discover → `tools/bind_skill_dataset.py --apply` to bind object class ID `skills` to the discovered Resource. API registration alone, with a null `data_source` on `skills`, makes `find_skills` fail.
+
+PostgreSQL DDL: `datasets/postgres/002_skill_registry.sql`. The table stores Skill discovery metadata only; it stores no credentials or Skill file bodies.
+
 ## 2. 安装
 
 脚本按方言分目录，文件名一致：

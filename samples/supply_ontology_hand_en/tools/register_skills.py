@@ -12,7 +12,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     print(f"skill_directory={root / 'skills'}")
     print("object_type=skills")
-    print("dataset=public.skills")
+    print("dataset=public.skills (create with setup_skill_dataset.py, then Discover and bind with bind_skill_dataset.py)")
     print(f"mode={'apply' if args.apply else 'dry-run'}")
 
 

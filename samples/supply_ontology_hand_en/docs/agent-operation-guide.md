@@ -29,6 +29,9 @@ python3 tools/setup_catalog.py --interactive --table-prefix hand_ --write-config
 python3 tools/import_kn.py --json kn/supply_ontology_hand_en.json --resolve-embedding
 python3 tools/bind_kn_resources.py --config tools/config.poc.yaml --kn-id supply_ontology_hand_en --table-prefix hand_
 python3 tools/register_skills.py --dry-run
+python3 tools/setup_skill_dataset.py --interactive --apply --kn-id supply_ontology_hand_en
+openbkn --json vega catalog discover <catalog-id> --wait
+python3 tools/bind_skill_dataset.py --kn-id supply_ontology_hand_en --catalog-id <catalog-id> --apply
 python3 tools/bootstrap_action_layer.py \
   --config tools/config.poc.yaml \
   --interactive --apply
@@ -41,6 +44,7 @@ python3 tools/bootstrap_action_layer.py \
 - Keep the function service running at `http://host.docker.internal:8765`. Reachability from the local browser does not prove reachability from the OpenBKN platform container.
 - Tools uploaded from OpenAPI may default to `disabled`; capture the returned `tool_id` values, run `openbkn tool enable --toolbox <box-id> <tool-id...>`, and verify that every tool is `enabled`.
 - Agent mode uses `bootstrap_action_layer.py` to apply idempotent DDL, verify the three tables, and bind object types in one flow. The password is used only during the prompt and is not written to `config.poc.yaml`.
+- The Skill Registry is also a database table: run `setup_skill_dataset.py` to create it and upsert published Skills from the current environment, Discover the Catalog again, then bind object class ID `skills` with `bind_skill_dataset.py`. Skill API registration alone is not sufficient for `find_skills`.
 - Use the individual `--dry-run` commands to inspect plans; after apply, verify both the database tables and `openbkn bkn object-type get` output.
 
 Use dry-run for every platform write first. The Agent must rely on returned capabilities and evidence rather than guessing object types, fields, Skills, or Actions.

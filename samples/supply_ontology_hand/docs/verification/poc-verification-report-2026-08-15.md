@@ -85,3 +85,16 @@ Playbook 行为用例全部通过，覆盖澄清、证据优先、技能调用�
 - 计划/采购：存在截止日前的生产记录，但没有足够证据证明仍有 3000 台未被消耗的可交付量；部分采购订单交期为 2026-06/07，晚于目标日。
 
 S1 结论：**不能证明按 2026-05-31 交付 3000 台；当前证据应判定为存在交付风险，不放行承诺。** 本次未执行任何 Action。
+
+## Skill Registry POC 状态
+
+未来场景预测已在 POC 命中：`0000023181-FUTURE` 为 3000 台、截止 2026-10-31；`0000023181-SHORT` 为 6000 台、截止 2026-11-30。
+
+检查 `find_skills` 时发现 POC 对象类 `skills` 的 `data_source` 为空，因而召回失败。已在样例中补齐：
+
+1. `datasets/postgres/002_skill_registry.sql`
+2. `tools/setup_skill_dataset.py`：建表并从当前环境已发布 Skill 幂等回填
+3. `tools/bind_skill_dataset.py`：Discover 后按 Resource 绑定 `skills`
+4. 中英文测试与 Agent/手工手册说明
+
+POC 还需操作者执行一次带数据库密码的命令，随后重新 Discover 和绑定；在此之前，Skill 召回不计入 POC 通过项。

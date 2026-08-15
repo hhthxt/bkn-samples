@@ -69,3 +69,16 @@ The same POC Context Loader then completed a read-only S1 Interaction:
 - Plans/purchasing: production records exist before the due date, but the snapshot does not prove that 3,000 units remain unconsumed and deliverable; some purchase orders have June/July 2026 delivery dates, after the target date.
 
 S1 conclusion: **The evidence does not prove delivery of 3,000 units by 2026-05-31; treat the commitment as at risk and do not release it.** No Action was executed.
+
+## Skill Registry POC status
+
+The future forecast scenarios are present in POC: `0000023181-FUTURE` is 3,000 units due 2026-10-31; `0000023181-SHORT` is 6,000 units due 2026-11-30.
+
+During `find_skills` validation, the POC object class `skills` was found with a null `data_source`, so recall failed. The sample now includes:
+
+1. `datasets/postgres/002_skill_registry.sql`
+2. `tools/setup_skill_dataset.py` to create and idempotently seed the registry from published Skills in the current environment
+3. `tools/bind_skill_dataset.py` to bind `skills` to the discovered Resource
+4. Matching English/Chinese tests and Agent/manual documentation
+
+The POC operator must run the password-protected database step once, then Discover and bind the Resource. Until that is done, Skill recall is not counted as passed.
