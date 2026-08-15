@@ -46,6 +46,8 @@ The sample includes the database push script; operators do not need to write INS
 python3 tools/load_sample_data.py --interactive --create-database --table-prefix hand_
 ```
 
+Keep the names separate: use `supply_ontology_hand_poc` for the PostgreSQL database, `Supply_Ontology_Hand_POC` for the OpenBKN physical Catalog/connection name, and `d9vuoqtjdthc73bmpprg` as the Catalog ID. Do not enter the Catalog name or ID as the PostgreSQL database name.
+
 The script first creates the target database through the `postgres` maintenance database if it does not exist, then prompts for connection details. The password is hidden; it tests the connection and writes only after `yes`; destination tables are named `hand_<original_table>`. If the account lacks `CREATEDB`, ask a DBA to create the database and rerun without `--create-database`.
 
 After loading the tables, use the same connection details to create the dedicated physical Catalog:

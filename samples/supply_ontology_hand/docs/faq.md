@@ -85,3 +85,7 @@ openbkn --json context tool-call supply_ontology_hand bkn_start_interaction \\
 ```
 
 后续查询必须复用返回的 `conversation_id` 和 `interaction_id`，并在结束时调用 `bkn_finish_interaction`。
+
+## Q15：数据库名和 OpenBKN 连接名称是不是一回事？
+
+不是。POC 中 PostgreSQL 数据库名是 `supply_ontology_hand_poc`，OpenBKN 物理 Catalog/连接名称是 `Supply_Ontology_Hand_POC`，Catalog ID 是 `d9vuoqtjdthc73bmpprg`。数据库脚本提示数据库名时只能填第一个值。

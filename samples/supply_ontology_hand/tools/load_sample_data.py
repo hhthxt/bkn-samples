@@ -224,7 +224,7 @@ def main(argv: list[str] | None = None) -> int:
                 "engine": "postgres",
                 "host": input("数据库 Host: ").strip(),
                 "port": int(input("端口 [5432]: ") or "5432"),
-                "database": input("数据库名: ").strip(),
+                "database": input("数据库名 [supply_ontology_hand_poc]: ").strip() or "supply_ontology_hand_poc",
                 "user": input("用户名: ").strip(),
                 "password": getpass.getpass("密码（输入时不显示）: "),
             },

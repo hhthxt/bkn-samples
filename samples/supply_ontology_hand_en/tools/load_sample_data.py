@@ -220,7 +220,7 @@ def main(argv: list[str] | None = None) -> int:
                 "engine": "postgres",
                 "host": input("Database host: ").strip(),
                 "port": int(input("Port [5432]: ") or "5432"),
-                "database": input("Database name: ").strip(),
+                "database": input("Database name [supply_ontology_hand_poc]: ").strip() or "supply_ontology_hand_poc",
                 "user": input("Username: ").strip(),
                 "password": getpass.getpass("Password (hidden): "),
             },

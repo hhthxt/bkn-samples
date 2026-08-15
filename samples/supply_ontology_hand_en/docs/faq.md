@@ -78,3 +78,7 @@ An Action Dataset is a database table first. In OpenBKN, an object type must bin
 Do not assume the data load failed. First read back the `kn_id`, Catalog, and object-type `data_source` actually used by the Agent. The fixed read-only POC entry point is the authenticated `openbkn context` CLI. If the in-app connector returns public/old Resources, the environments are routed differently; stop business acceptance and switch to the POC Context Loader. Never use old-resource results as POC evidence.
 
 The first Interaction must return a `conversation_id` and `interaction_id`; reuse both for later Context Loader calls and finish with `bkn_finish_interaction`.
+
+## Q15: Is the PostgreSQL database name the same as the OpenBKN connection name?
+
+No. In this POC, the PostgreSQL database is `supply_ontology_hand_poc`, the OpenBKN physical Catalog/connection name is `Supply_Ontology_Hand_POC`, and the Catalog ID is `d9vuoqtjdthc73bmpprg`. Database prompts must use only the first value.

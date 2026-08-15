@@ -46,6 +46,8 @@ PY
 python3 tools/load_sample_data.py --interactive --create-database --table-prefix hand_
 ```
 
+名称必须区分：数据库名填 `supply_ontology_hand_poc`；OpenBKN 里的物理 Catalog/连接名称填 `Supply_Ontology_Hand_POC`；后续脚本使用 Catalog ID `d9vuoqtjdthc73bmpprg`。数据库名不是 Catalog 名称，也不是 Catalog ID。
+
 脚本会先使用 `postgres` 维护库创建目标数据库（若不存在），再提示连接信息；密码不回显，连接测试成功后必须输入 `yes` 才开始写入，目标表名为 `hand_<原表名>`。若数据库账号没有 `CREATEDB` 权限，应由 DBA 先建库，再去掉 `--create-database` 重试。
 
 数据库表导入后，使用同一组连接信息创建独立物理 Catalog：

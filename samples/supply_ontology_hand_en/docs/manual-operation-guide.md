@@ -10,6 +10,8 @@ Database-table import is a required online prerequisite. The operator must perfo
 python3 tools/load_sample_data.py --interactive --create-database --table-prefix hand_
 ```
 
+Use `supply_ontology_hand_poc` for the PostgreSQL database name and `Supply_Ontology_Hand_POC` for the OpenBKN connection/Catalog name. They are different values; a Catalog ID must never be entered as the database name.
+
 Enter the PostgreSQL host, port, database, username, and password. After the connection test succeeds, type `yes`; the script creates `hand_`-prefixed tables and preserves existing business tables.
 
 ## UI operations

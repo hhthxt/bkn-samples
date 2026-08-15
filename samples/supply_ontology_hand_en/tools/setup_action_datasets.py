@@ -35,7 +35,7 @@ def interactive_connection():
     import psycopg
     host = input("Database Host: ").strip()
     port = int(input("Port [5432]: ") or "5432")
-    database = input("Database name: ").strip()
+    database = input("Database name [supply_ontology_hand_poc]: ").strip() or "supply_ontology_hand_poc"
     user = input("Username: ").strip()
     password = getpass.getpass("Password (hidden): ")
     return psycopg.connect(host=host, port=port, dbname=database, user=user, password=password)

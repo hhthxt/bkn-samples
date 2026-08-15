@@ -10,6 +10,8 @@
 python3 tools/load_sample_data.py --interactive --create-database --table-prefix hand_
 ```
 
+提示：PostgreSQL 数据库名使用 `supply_ontology_hand_poc`；OpenBKN 连接/Catalog 名称使用 `Supply_Ontology_Hand_POC`。两者不同，Catalog ID 也不能当数据库名输入。
+
 依次输入 PostgreSQL Host、端口、数据库名、用户名和密码。连接测试成功后输入 `yes`，脚本会创建 `hand_` 前缀表并保留原有业务表。
 
 ## 界面操作
