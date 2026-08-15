@@ -6,6 +6,8 @@
 Create a dedicated database/connection → create a dedicated physical Catalog → load sample tables → Discover → verify resources → bind object types → register metrics
 ```
 
+Action Datasets use the same chain: after creating the tables, run Discover again. A table name cannot be used directly as an object-type `data_source.id`.
+
 ## Agent/API mode
 
 A physical Catalog is not a file-upload container. The supply sample must use a dedicated database and Catalog; do not reuse the existing POC `RT_Supply_Data`, otherwise sample data will be mixed with real data. Suggested names are database `supply_ontology_hand_poc` and Catalog `Supply_Ontology_Hand_POC`.

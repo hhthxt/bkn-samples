@@ -68,3 +68,7 @@ Keep `fn_service` running on port 8765 and verify that the OpenBKN platform cont
 ## Q12: The OpenAPI upload succeeded but the tools cannot be called
 
 Upload success does not mean the tools are enabled. Check each tool status in the Toolbox, enable any `disabled` tool with its returned `tool_id`, and verify again.
+
+## Q13: Why can an Action Dataset not use `data_source.type=dataset` directly?
+
+An Action Dataset is a database table first. In OpenBKN, an object type must bind to the Resource created by physical Catalog Discover. The required order is: create tables, Discover the Catalog, resolve `resource_id`, then bind with `data_source.type=resource`. `bootstrap_action_layer.py` performs these steps automatically.

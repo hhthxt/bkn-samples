@@ -35,6 +35,22 @@ def parse_json(raw):
     return data
 
 
+def find_resource_id(catalog_id, dataset, run_cmd=run_cmd):
+    raw = run_cmd(["openbkn", "--json", "resource", "find", "--catalog-id", catalog_id, "--name", dataset, "--exact"])
+    data = json.loads(raw)
+    entries = data.get("entries", []) if isinstance(data, dict) else data
+    if isinstance(entries, dict):
+        entries = [entries]
+    for entry in entries or []:
+        if entry.get("id"):
+            return str(entry["id"])
+    raise RuntimeError(f"resource not found for Action Dataset {dataset}")
+
+
+def discover_catalog(catalog_id, run_cmd=run_cmd):
+    run_cmd(["openbkn", "--json", "vega", "catalog", "discover", catalog_id, "--wait"])
+
+
 def resolve_path(root, value):
     path = Path(value)
     if path.is_absolute():
@@ -53,10 +69,15 @@ def run_bind(config, mapping, *, dry_run, run_cmd=run_cmd):
     report = {"kn_id": kn_id, "dry_run": dry_run, "ok": True, "bindings": bindings}
     if dry_run:
         return report
+    catalog_id = (config.get("vega") or {}).get("catalog_id")
+    if not catalog_id:
+        raise ValueError("vega.catalog_id is required for Action Dataset binding")
     for binding in bindings:
+        resource_id = find_resource_id(catalog_id, binding["dataset"], run_cmd=run_cmd)
+        binding["resource_id"] = resource_id
         current = parse_json(run_cmd(["openbkn", "--json", "bkn", "object-type", "get", kn_id, binding["object_type_id"]]))
         body = copy.deepcopy(current)
-        body["data_source"] = {"type": "dataset", "id": binding["dataset"]}
+        body["data_source"] = {"type": "resource", "id": resource_id}
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as tmp:
             json.dump(body, tmp, ensure_ascii=False)
             body_path = tmp.name

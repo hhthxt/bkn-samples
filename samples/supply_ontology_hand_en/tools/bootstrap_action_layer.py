@@ -8,7 +8,7 @@ from pathlib import Path
 
 import yaml
 
-from bind_action_datasets import run_bind
+from bind_action_datasets import discover_catalog, run_bind
 from setup_action_datasets import apply_ddl, interactive_connection
 
 
@@ -40,6 +40,7 @@ def main(argv: list[str] | None = None) -> int:
         ddl = apply_ddl(connection, schema=(config.get("database") or {}).get("schema") or "public")
     finally:
         connection.close()
+    discover_catalog((config.get("vega") or {}).get("catalog_id"))
     bind = run_bind(config, mapping, dry_run=False)
     print(json.dumps({"mode": "apply", "ddl": ddl, "bind": bind}, ensure_ascii=False, indent=2))
     return 0

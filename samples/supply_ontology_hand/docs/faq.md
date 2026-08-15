@@ -68,3 +68,7 @@ POC 的 Toolbox 名称只允许中文、英文字母、数字和下划线。不�
 ## Q12：OpenAPI 上传成功但工具不能调用怎么办？
 
 上传成功不等于工具已启用。检查 Toolbox 中每个工具的状态；如果是 `disabled`，使用上传回执中的 `tool_id` 执行 `openbkn tool enable`，再重新查询确认。
+
+## Q13：为什么 Action Dataset 不能直接用 `data_source.type=dataset` 绑定？
+
+Action Dataset 首先是数据库表；对象类在 OpenBKN 中必须绑定物理 Catalog Discover 出来的 Resource。因此正确顺序是：建表 → Catalog Discover → 获取 `resource_id` → 用 `data_source.type=resource` 绑定。`bootstrap_action_layer.py` 已自动执行这四步。
