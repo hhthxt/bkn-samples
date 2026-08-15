@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import argparse
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -40,16 +41,25 @@ def _remove_null_schemas(value: Any) -> Any:
     return cleaned
 
 
-def build_toolbox_openapi() -> dict[str, Any]:
+def build_toolbox_openapi(service_url: str | None = None) -> dict[str, Any]:
     spec = _remove_null_schemas(deepcopy(app.openapi()))
     spec["openapi"] = "3.0.3"
-    spec["servers"] = [{"url": "http://host.docker.internal:8765"}]
+    if service_url:
+        spec["servers"] = [{"url": service_url.rstrip("/")}]
+    else:
+        spec.pop("servers", None)
     return spec
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Export function Toolbox OpenAPI")
+    parser.add_argument(
+        "--service-url",
+        help="POC-reachable function service URL; omit to leave endpoint configuration to Toolbox setup",
+    )
+    args = parser.parse_args()
     OUTPUT.write_text(
-        json.dumps(build_toolbox_openapi(), ensure_ascii=False, indent=2) + "\n",
+        json.dumps(build_toolbox_openapi(args.service_url), ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
     print(OUTPUT)

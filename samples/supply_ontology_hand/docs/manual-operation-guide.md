@@ -40,7 +40,7 @@ python3 verify_sample.py --config config.poc.yaml --kn-id supply_ontology_hand
 
 函数服务启动后，Toolbox 名称只能使用中文、字母、数字和下划线，不能含连字符、空格或其他标点。创建前先在 UI 或 `openbkn toolbox list` 中确认同名 Toolbox；如果 POC 返回连接超时，先检查 `openbkn auth status` 和 Toolbox 列表，再决定是否重试，避免重复创建。
 
-函数服务地址为 `http://host.docker.internal:8765`。服务进程必须持续运行，不能在上传 OpenAPI 后立即关闭。
+函数服务地址不能硬编码。启动函数服务后，由部署者将 OpenBKN/POC 网络可访问的 `FUNCTION_SERVICE_URL` 注入 Toolbox 和 OpenAPI；`host.docker.internal` 仅是部分本地 Docker 环境的别名。服务进程必须持续运行，不能在上传 OpenAPI 后立即关闭。
 
 ### Action Dataset 建表
 

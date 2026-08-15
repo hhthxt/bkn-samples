@@ -99,8 +99,13 @@ def test_exported_openapi_is_toolbox_compatible():
     spec = build_toolbox_openapi()
     encoded = str(spec)
     assert spec["openapi"] == "3.0.3"
-    assert spec["servers"] == [{"url": "http://host.docker.internal:8765"}]
+    assert "servers" not in spec
     assert "'type': 'null'" not in encoded
     for methods in spec["paths"].values():
         for operation in methods.values():
             assert re.fullmatch(r"[\u4e00-\u9fffA-Za-z0-9_]+", operation["summary"])
+
+
+def test_openapi_injects_explicit_portable_service_url():
+    spec = build_toolbox_openapi("https://functions.example.com")
+    assert spec["servers"] == [{"url": "https://functions.example.com"}]

@@ -40,7 +40,7 @@ Then follow the Action Dataset, Skill registration, and function-service instruc
 
 Toolbox names may contain only Chinese characters, letters, digits, and underscores. Do not use hyphens, spaces, or other punctuation. Check for an existing Toolbox before creating one; after a POC timeout, check `openbkn auth status` and the Toolbox list before retrying.
 
-Keep the function service running at `http://host.docker.internal:8765`; uploading the OpenAPI document does not work if the service is stopped afterward.
+Do not hard-code the function service URL. After starting the service, inject a `FUNCTION_SERVICE_URL` reachable from the OpenBKN/POC network into the Toolbox and OpenAPI; `host.docker.internal` is only a local Docker alias in some environments. Keep the service running after uploading the OpenAPI document.
 
 ### Action Dataset tables
 

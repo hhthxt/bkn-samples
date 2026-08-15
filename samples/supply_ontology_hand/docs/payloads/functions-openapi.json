@@ -562,8 +562,7 @@
           },
           "demand_qty": {
             "type": "number",
-            "minimum": 0.0,
-            "exclusiveMinimum": true,
+            "exclusiveMinimum": 0.0,
             "title": "Demand Qty",
             "description": "需求数量，须与预测单一致"
           },
@@ -1147,10 +1146,5 @@
         "title": "ValidationError"
       }
     }
-  },
-  "servers": [
-    {
-      "url": "http://host.docker.internal:8765"
-    }
-  ]
+  }
 }
