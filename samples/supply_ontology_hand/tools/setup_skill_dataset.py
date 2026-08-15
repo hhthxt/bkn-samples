@@ -29,7 +29,7 @@ def seed_rows(entries: list[dict], kn_id: str) -> list[dict]:
             "status": str(entry.get("status") or "published"),
             "business_domain_id": str(entry.get("business_domain_id") or ""),
             "kn_id": kn_id,
-            "object_type_ids": entry.get("object_type_ids") or [],
+            "object_type_ids": entry.get("object_type_ids") or ["skills"],
             "skill_query": " ".join(part for part in (name, description) if part),
         })
     return [row for row in rows if row["skill_id"] and row["name"]]

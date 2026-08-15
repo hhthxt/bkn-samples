@@ -22,7 +22,7 @@ def test_seed_rows_are_dataset_records_for_published_skills():
         "status": "published",
         "business_domain_id": "",
         "kn_id": "supply_ontology_hand",
-        "object_type_ids": [],
+        "object_type_ids": ["skills"],
         "skill_query": "demo demo desc",
     }]
 

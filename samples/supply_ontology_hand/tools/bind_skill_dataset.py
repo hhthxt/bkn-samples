@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import subprocess
 import tempfile
@@ -14,7 +15,9 @@ def build_binding(kn_id: str, object_type_id: str, resource_id: str) -> dict:
 
 
 def run(args: list[str]) -> dict:
-    proc = subprocess.run(["openbkn", "--json", *args], check=True, capture_output=True, text=True)
+    proc = subprocess.run(["openbkn", "--json", *args], check=False, capture_output=True, text=True)
+    if proc.returncode:
+        raise RuntimeError((proc.stderr or proc.stdout).strip())
     return json.loads(proc.stdout)
 
 
@@ -34,8 +37,13 @@ def main() -> None:
     print(json.dumps(binding, ensure_ascii=False, indent=2))
     if not args.apply:
         return
+    current = run(["bkn", "object-type", "get", args.kn_id, "skills"])
+    if isinstance(current, dict) and isinstance(current.get("entries"), list):
+        current = current["entries"][0]
+    body = copy.deepcopy(current)
+    body["data_source"] = binding["data_source"]
     with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".json", delete=False) as handle:
-        json.dump({"data_source": binding["data_source"]}, handle, ensure_ascii=False)
+        json.dump(body, handle, ensure_ascii=False)
         body_path = Path(handle.name)
     try:
         run(["bkn", "object-type", "update", args.kn_id, "skills", "--body-file", str(body_path)])
