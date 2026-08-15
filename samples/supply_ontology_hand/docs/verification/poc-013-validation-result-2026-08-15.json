@@ -1,0 +1,60 @@
+{
+  "report_date": "2026-08-15",
+  "target": {
+    "base_url": "https://poc.openbkn.ai",
+    "knowledge_network_id": "supply_ontology_hand",
+    "cli_version": "0.1.2",
+    "platform_build_version": "not_exposed_by_cli"
+  },
+  "release_gates": {
+    "data_layer": "pass",
+    "agent_basics": "pass",
+    "skill_discovery": "pass",
+    "function_online_story": "native_runtime_smoke_pass; real_s1_s2_s3_agent_story_not_released",
+    "action_execution": "not_executed; dry_run_only_requires_explicit_approval"
+  },
+  "network": {
+    "object_types": 15,
+    "relation_types": 19,
+    "action_types": 3,
+    "metrics": 8
+  },
+  "sample_data": {
+    "business_tables": 12,
+    "forecast_rows": 137,
+    "forecast_total_qty": 115922,
+    "open_forecast_count": 90,
+    "closed_forecast_count": 47,
+    "open_forecast_total_qty": 56340
+  },
+  "metric_observations": {
+    "product_total_count": 30,
+    "material_total_count": 3497,
+    "supplier_total_count": 230,
+    "sales_order_count": 800,
+    "sales_order_count_382_000005": 40,
+    "warehouse_count": 29,
+    "inventory_382_finished_goods": 534,
+    "forecast_total_qty": 115922,
+    "open_forecast_count": 90
+  },
+  "third_party_release_verdict": "third_party_base_pass; full_real_time_s1_s2_s3_not_released",
+  "evidence": {
+    "prior_poc_report": "poc-verification-report-2026-08-15.md",
+    "context_loader_validation": {
+      "product": "382-000005 returned",
+      "sales_orders": "40 records matched",
+      "inventory": "382-000005 records returned",
+      "skills": "3 published supply-chain skills recalled",
+      "evidence_status": "complete"
+    },
+    "native_function_validation": {
+      "toolbox_type": "function",
+      "operation": "open_forecast_count",
+      "normal_context": {"exit_code": 0, "open_count": 1},
+      "compressed_context": {"exit_code": 0, "open_count": 1},
+      "scope": "minimal runtime smoke only; not a real S1/S2/S3 delivery decision"
+    },
+    "known_product_gaps": [939, 940, 941, 942]
+  }
+}

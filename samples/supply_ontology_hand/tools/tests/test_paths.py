@@ -12,6 +12,22 @@ def test_pack_layout_exists():
     assert (TOOLS / "requirements.txt").is_file()
     assert (TOOLS / ".gitignore").is_file()
     assert (PACK / "README.md").is_file()
+    assert (TOOLS / "power_layer.py").is_file()
+    assert (TOOLS / "fn" / "__init__.py").is_file()
+    assert (TOOLS / "fn_cli.py").is_file()
+    assert (TOOLS / "fn_service.py").is_file()
+    assert (TOOLS / "export_fn_openapi.py").is_file()
+    skills = PACK / "skills"
+    assert (skills / "production-schedule-backward-planning" / "SKILL.md").is_file()
+    assert (skills / "demand-fulfillment-capacity-analysis" / "SKILL.md").is_file()
+    assert (skills / "demand-fulfillment-requirement-coverage-analysis" / "SKILL.md").is_file()
+    docs = PACK / "docs"
+    assert (docs / "动力层落地说明书.md").is_file()
+    payloads = docs / "payloads"
+    assert (payloads / "metrics-create.json").is_file()
+    assert (payloads / "metrics-query-examples.json").is_file()
+    assert (payloads / "logic-properties.json").is_file()
+    assert (payloads / "functions-openapi.json").is_file()
 
 
 def test_sample_has_twelve_csv():

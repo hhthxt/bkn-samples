@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import argparse
 import csv
+import getpass
+import re
 import re
 import sys
 from pathlib import Path
@@ -10,6 +12,8 @@ from typing import Iterable
 import yaml
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
+import psycopg
+from psycopg import sql as psycopg_sql
 
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}")
 _SAMPLE_ROWS = 200
@@ -89,6 +93,28 @@ def build_engine(db: dict) -> Engine:
     return create_engine(url)
 
 
+def ensure_postgres_database(db: dict) -> None:
+    name = str(db["database"])
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+        raise ValueError("database name must contain only letters, digits, and underscores")
+    maintenance = dict(db)
+    maintenance["database"] = "postgres"
+    conn = psycopg.connect(
+        host=maintenance["host"], port=maintenance["port"],
+        dbname=maintenance["database"], user=maintenance["user"],
+        password=maintenance["password"], autocommit=True,
+    )
+    try:
+        exists = conn.execute("select 1 from pg_database where datname = %s", (name,)).fetchone()
+        if not exists:
+            conn.execute(psycopg_sql.SQL("CREATE DATABASE {}" ).format(psycopg_sql.Identifier(name)))
+            print(f"Created database: {name}")
+        else:
+            print(f"Database already exists: {name}")
+    finally:
+        conn.close()
+
+
 def _infer_schema(header: list[str], rows: list[list[str]], engine_name: str) -> list[tuple[str, str]]:
     col_types: list[tuple[str, str]] = []
     for idx, col in enumerate(header):
@@ -163,7 +189,7 @@ def _load_table(
     return count
 
 
-def load_all(engine: Engine, cfg: dict, mapping: dict) -> dict[str, int]:
+def load_all(engine: Engine, cfg: dict, mapping: dict, *, table_prefix: str = "") -> dict[str, int]:
     load_cfg = cfg["load"]
     sample_dir = Path(load_cfg["sample_dir"])
     mode = load_cfg.get("mode", "recreate")
@@ -174,7 +200,9 @@ def load_all(engine: Engine, cfg: dict, mapping: dict) -> dict[str, int]:
     for table in resolve_load_order(mapping):
         csv_path = sample_dir / f"{table}.csv"
         try:
-            report[table] = _load_table(engine, table, csv_path, mode, engine_name)
+            report[table_prefix + table] = _load_table(
+                engine, table_prefix + table, csv_path, mode, engine_name
+            )
         except Exception as exc:
             print(f"ERROR loading {table}: {exc}", file=sys.stderr)
             if on_error == "stop":
@@ -185,19 +213,52 @@ def load_all(engine: Engine, cfg: dict, mapping: dict) -> dict[str, int]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Load data/*.csv into a database")
     parser.add_argument("--config", default="config.yaml", help="Path to config YAML")
+    parser.add_argument("--interactive", action="store_true", help="Prompt for PostgreSQL connection details without saving them")
+    parser.add_argument("--table-prefix", default=None, help="Prefix for destination table names, e.g. hand_")
+    parser.add_argument("--create-database", action="store_true", help="Create the target PostgreSQL database using the postgres maintenance database")
     args = parser.parse_args(argv)
 
-    config_path = Path(args.config)
-    if not config_path.is_file():
-        print(f"Config not found: {config_path}", file=sys.stderr)
-        return 1
-
-    cfg = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    if args.interactive:
+        cfg = {
+            "database": {
+                "engine": "postgres",
+                "host": input("数据库 Host: ").strip(),
+                "port": int(input("端口 [5432]: ") or "5432"),
+                "database": input("数据库名 [supply_ontology_hand_poc]: ").strip() or "supply_ontology_hand_poc",
+                "user": input("用户名: ").strip(),
+                "password": getpass.getpass("密码（输入时不显示）: "),
+            },
+            "load": {
+                "sample_dir": str(_SCRIPT_DIR.parent / "data"),
+                "mode": "recreate",
+                "on_error": "stop",
+            },
+        }
+    else:
+        config_path = Path(args.config)
+        if not config_path.is_file():
+            print(f"Config not found: {config_path}", file=sys.stderr)
+            return 1
+        cfg = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     mapping = yaml.safe_load(_DEFAULT_MAP.read_text(encoding="utf-8"))
+    table_prefix = args.table_prefix
+    if table_prefix is None:
+        table_prefix = (cfg.get("load") or {}).get("table_prefix", "")
 
     try:
         engine = build_engine(cfg["database"])
-        report = load_all(engine, cfg, mapping)
+        if args.create_database:
+            ensure_postgres_database(cfg["database"])
+            engine = build_engine(cfg["database"])
+        with engine.connect():
+            pass
+        print("Database connection succeeded.")
+        if args.interactive:
+            answer = input(f"导入 {len(mapping['load_order'])} 张表并加前缀 {table_prefix!r}？输入 yes 开始：").strip().lower()
+            if answer not in ("yes", "y"):
+                print("已取消，没有写入数据。")
+                return 0
+        report = load_all(engine, cfg, mapping, table_prefix=table_prefix)
     except Exception as exc:
         print(f"Load failed: {exc}", file=sys.stderr)
         if cfg.get("load", {}).get("on_error", "stop") == "stop":

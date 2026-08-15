@@ -41,8 +41,8 @@ def load_mapping(path: Path | None = None) -> dict:
     return yaml.safe_load(map_path.read_text(encoding="utf-8"))
 
 
-def expected_tables(mapping: dict) -> list[str]:
-    return list(mapping["load_order"])
+def expected_tables(mapping: dict, table_prefix: str = "") -> list[str]:
+    return [table_prefix + table for table in mapping["load_order"]]
 
 
 def build_connector_config(cfg: dict) -> dict:
@@ -124,9 +124,10 @@ def verify_tables(
     catalog_id: str,
     mapping: dict,
     *,
+    table_prefix: str = "",
     run_cmd: Callable[[list[str]], str],
 ) -> dict[str, Any]:
-    expected = set(expected_tables(mapping))
+    expected = set(expected_tables(mapping, table_prefix))
     resources = _catalog_resources(catalog_id, run_cmd=run_cmd)
     found = {_resource_table_name(r) for r in resources}
     found.discard(None)
@@ -148,6 +149,7 @@ def run_catalog_setup(
     dry_run: bool = False,
     rediscover: bool = False,
     skip_discover: bool = False,
+    table_prefix: str = "",
     run_cmd: Callable[[list[str]], str] | None = None,
 ) -> dict[str, Any]:
     cmd = run_cmd or _default_run_cmd
@@ -212,7 +214,7 @@ def run_catalog_setup(
     report["catalog_id"] = catalog_id
 
     if dry_run:
-        report["verification"] = verify_tables(catalog_id, mapping, run_cmd=cmd)
+        report["verification"] = verify_tables(catalog_id, mapping, table_prefix=table_prefix, run_cmd=cmd)
         return report
 
     if not catalog_entry.get("enabled"):
@@ -229,7 +231,7 @@ def run_catalog_setup(
     else:
         report["steps"].append({"action": "discover_skipped"})
 
-    verification = verify_tables(catalog_id, mapping, run_cmd=cmd)
+    verification = verify_tables(catalog_id, mapping, table_prefix=table_prefix, run_cmd=cmd)
     report["verification"] = verification
     if not verification["ok"]:
         missing = ", ".join(verification["missing"])
@@ -252,6 +254,25 @@ def write_catalog_id_to_config(config_path: Path, catalog_id: str) -> None:
     config_path.write_text(updated, encoding="utf-8")
 
 
+def write_interactive_config(catalog_id: str, catalog_name: str, table_prefix: str) -> Path:
+    """Write a credential-free config for later bind steps."""
+    path = _SCRIPT_DIR / "config.poc.yaml"
+    path.write_text(
+        "openbkn:\n"
+        f"  kn_id: supply_ontology_hand\n"
+        f"  kn_name: {catalog_name}\n"
+        "vega:\n"
+        f"  catalog_id: {catalog_id}\n"
+        f"  catalog_name: {catalog_name}\n"
+        "database:\n"
+        "  schema: public\n"
+        "load:\n"
+        f"  table_prefix: {table_prefix}\n",
+        encoding="utf-8",
+    )
+    return path
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Setup Vega catalog and discover sample tables (step 4)")
     parser.add_argument("--config", default="config.yaml", help="Path to config YAML")
@@ -267,22 +288,48 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Write vega.catalog_id back into config file after success",
     )
+    parser.add_argument("--interactive", action="store_true", help="Prompt for a new PostgreSQL connection and Catalog name")
+    parser.add_argument("--table-prefix", default=None, help="Prefix on destination table names, e.g. hand_")
     args = parser.parse_args(argv)
 
     config_path = Path(args.config)
     try:
-        config = load_config(config_path)
+        if args.interactive:
+            import getpass
+            catalog_name = input("New Catalog name（必填）: ").strip()
+            if not catalog_name:
+                raise ValueError("Catalog 名称不能为空；请填写本环境独立名称")
+            host = input("PostgreSQL host: ").strip()
+            port = int(input("Port [5432]: ") or "5432")
+            database = input("Database name（必填）: ").strip()
+            if not database:
+                raise ValueError("数据库名不能为空；请填写本环境 sample 数据库名")
+            user = input("Username: ").strip()
+            password = getpass.getpass("Password (hidden): ")
+            config = {"database": {"engine": "postgres", "host": host, "port": port, "database": database, "user": user, "password": password, "schema": "public"}, "vega": {"catalog_name": catalog_name, "catalog_host": host, "connector_type": "postgresql", "connector_options": {"sslmode": "disable"}}}
+        else:
+            config = load_config(config_path)
         mapping = load_mapping()
+        table_prefix = args.table_prefix
+        if table_prefix is None:
+            table_prefix = (config.get("load") or {}).get("table_prefix", "")
         report = run_catalog_setup(
             config,
             mapping,
             dry_run=args.dry_run,
             rediscover=args.rediscover,
             skip_discover=args.skip_discover,
+            table_prefix=table_prefix,
         )
         if args.write_config and report.get("catalog_id") and not args.dry_run:
-            write_catalog_id_to_config(config_path, report["catalog_id"])
-            report["config_updated"] = str(config_path)
+            if args.interactive:
+                path = write_interactive_config(
+                    report["catalog_id"], config["vega"]["catalog_name"], table_prefix
+                )
+                report["config_updated"] = str(path)
+            else:
+                write_catalog_id_to_config(config_path, report["catalog_id"])
+                report["config_updated"] = str(config_path)
 
         print(json.dumps(report, ensure_ascii=False, indent=2))
         if args.dry_run:
