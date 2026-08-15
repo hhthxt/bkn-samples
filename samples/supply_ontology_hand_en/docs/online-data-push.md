@@ -87,7 +87,7 @@ Resolve the target embedding with `--resolve-embedding` during KN import. Data u
 - Toolbox name validation failed: remove hyphens, spaces, and punctuation; keep only Chinese characters, letters, digits, and underscores.
 - POC API request timed out: run `openbkn auth status`, then list Toolboxes or Skills to check actual state before retrying.
 - Function Toolbox cannot be called: keep the local function service running and verify that the platform container can reach `http://host.docker.internal:8765`.
-- Action Dataset binding has no effect: execute the SQL in the target database and verify the three `sc_` tables; `mode=apply` output alone is not platform evidence.
+- Action Dataset automation failed: run `python3 tools/bootstrap_action_layer.py --dry-run`, confirm database permissions and the three `sc_` tables, then verify object-type `data_source` with `openbkn bkn object-type get`.
 
 ## Manual mode
 

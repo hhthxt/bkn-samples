@@ -59,7 +59,7 @@ POC 的 Toolbox 名称只允许中文、英文字母、数字和下划线。不�
 
 ## Q10：`setup_action_datasets.py --apply` 是否已经把表建到数据库？
 
-当前脚本的 `--dry-run` 只输出 DDL，`--apply` 仍是保护性占位，不能当作建表成功证明。必须由操作者使用数据库客户端执行 `datasets/postgres/001_action_datasets.sql`，再查询三张 `sc_` 表确认。
+现在 Agent 模式使用 `bootstrap_action_layer.py --interactive --apply` 自动执行幂等 DDL 并验收三张表；密码不落盘。纯手工模式仍可直接执行 SQL。无论哪种模式，都必须查询三张 `sc_` 表确认。
 
 ## Q11：函数 Toolbox 创建成功但调用失败怎么办？
 

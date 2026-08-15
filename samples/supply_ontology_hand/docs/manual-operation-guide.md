@@ -42,9 +42,15 @@ python3 verify_sample.py --config config.poc.yaml --kn-id supply_ontology_hand
 
 ### Action Dataset 建表
 
-Action Dataset 不是导入 KN JSON 自动生成的。操作者必须把
-`datasets/postgres/001_action_datasets.sql` 手工执行到本 sample 专用数据库；执行前先备份或确认目标库，执行后核对三张表：
-`sc_pr_decision`、`sc_plan_monitor_task`、`sc_plan_monitor_item`。
+Agent 模式可用以下命令一次完成幂等建表、三张表验收和对象类绑定；密码只在提示时输入，不写入配置：
+
+```bash
+python3 tools/bootstrap_action_layer.py \
+  --config tools/config.poc.yaml \
+  --interactive --apply
+```
+
+若采用纯手工模式，仍可直接执行 `datasets/postgres/001_action_datasets.sql`；执行前确认目标库，执行后核对 `sc_pr_decision`、`sc_plan_monitor_task`、`sc_plan_monitor_item`。
 
 人工模式的界面截图、资源 ID 和操作时间应记录在本次验证报告中；不得把环境特定 ID 写回可移植 KN JSON。
 

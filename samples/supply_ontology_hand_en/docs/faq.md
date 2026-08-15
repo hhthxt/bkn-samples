@@ -59,7 +59,7 @@ Do not blindly retry creation. Run `openbkn auth status`, then list Toolboxes an
 
 ## Q10: Does `setup_action_datasets.py --apply` create the tables?
 
-Not currently. The script is a protected placeholder; the operator must execute `datasets/postgres/001_action_datasets.sql` with a database client and verify the three `sc_` tables.
+Agent mode now uses `bootstrap_action_layer.py --interactive --apply` to execute idempotent DDL and verify the three tables. The password is not persisted. Manual mode may still execute the SQL directly.
 
 ## Q11: Why is a function Toolbox created but not callable?
 

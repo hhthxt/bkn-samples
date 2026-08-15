@@ -42,7 +42,15 @@ Keep the function service running at `http://host.docker.internal:8765`; uploadi
 
 ### Action Dataset tables
 
-Action Datasets are not created by importing the KN JSON. The operator must execute `datasets/postgres/001_action_datasets.sql` against the dedicated sample database and verify `sc_pr_decision`, `sc_plan_monitor_task`, and `sc_plan_monitor_item` afterward.
+Agent mode can create and verify the tables and bind the object types in one step:
+
+```bash
+python3 tools/bootstrap_action_layer.py \
+  --config tools/config.poc.yaml \
+  --interactive --apply
+```
+
+The password is entered only at the prompt and is not persisted. Manual mode may still execute `datasets/postgres/001_action_datasets.sql` directly and verify `sc_pr_decision`, `sc_plan_monitor_task`, and `sc_plan_monitor_item`.
 
 Record UI screenshots, environment-specific resource IDs, and operation timestamps in the verification report; do not write environment-specific IDs back into the portable KN JSON.
 

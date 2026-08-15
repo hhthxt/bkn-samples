@@ -29,8 +29,9 @@ python3 tools/setup_catalog.py --interactive --table-prefix hand_ --write-config
 python3 tools/import_kn.py --json kn/supply_ontology_hand.json --resolve-embedding
 python3 tools/bind_kn_resources.py --config tools/config.poc.yaml --kn-id supply_ontology_hand --table-prefix hand_
 python3 tools/register_skills.py --dry-run
-python3 tools/setup_action_datasets.py --engine postgres
-python3 tools/bind_action_datasets.py --mapping tools/mapping/action_dataset_map.yaml
+python3 tools/bootstrap_action_layer.py \
+  --config tools/config.poc.yaml \
+  --interactive --apply
 ```
 
 ### 平台写入前的实施约束
@@ -39,8 +40,8 @@ python3 tools/bind_action_datasets.py --mapping tools/mapping/action_dataset_map
 - 每次创建前先用 `openbkn toolbox list` 按名称确认是否已经存在。若命令出现连接超时，不要立即重复创建；先执行 `openbkn auth status`，再查询列表确认平台是否已创建成功。
 - 函数服务必须先启动并保持运行，服务地址使用 `http://host.docker.internal:8765`；OpenBKN 平台能访问该地址，不等于本机浏览器能访问该地址。
 - OpenAPI 上传后工具默认可能是 `disabled`；必须记录返回的 `tool_id`，执行 `openbkn tool enable --toolbox <box-id> <tool-id...>`，再查询 Toolbox 确认全部为 `enabled`。
-- Action Dataset 的 DDL 必须由操作者用数据库连接执行；`setup_action_datasets.py --dry-run` 只打印 SQL，未确认前不使用真实库。
-- `bind_action_datasets.py` 和 `register_skills.py` 当前先输出绑定/注册计划；看到 `mode=apply` 不代表已经完成平台写入，必须再用 `openbkn` 查询结果验收。
+- Agent 模式由 `bootstrap_action_layer.py` 一次完成幂等建表、三张表验收和对象类绑定；密码只在本次交互中使用，不写入 `config.poc.yaml`。
+- `setup_action_datasets.py --dry-run` 和 `bind_action_datasets.py --dry-run` 仍可分别检查计划；正式执行后必须再用数据库查询和 `openbkn bkn object-type get` 验收。
 
 所有平台写入先用 dry-run；Agent 只能在平台返回能力和证据后继续，不得猜测对象类、字段、Skill 或 Action。
 
