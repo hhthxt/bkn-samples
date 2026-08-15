@@ -42,6 +42,15 @@ Toolbox names may contain only Chinese characters, letters, digits, and undersco
 
 Do not hard-code the function service URL. After starting the service, inject a `FUNCTION_SERVICE_URL` reachable from the OpenBKN/POC network into the Toolbox and OpenAPI; `host.docker.internal` is only a local Docker alias in some environments. Keep the service running after uploading the OpenAPI document.
 
+This sample includes a self-hostable function-service container. On a development machine or a customer-controlled Docker host, run:
+
+```bash
+docker compose -f docker-compose.function.yaml up -d --build
+curl http://127.0.0.1:8765/health
+```
+
+After local verification, do not put `http://127.0.0.1:8765` into a remote POC Toolbox. Deploy the same container to a customer/partner-controlled runtime reachable from OpenBKN, then use that runtime's HTTPS address as `FUNCTION_SERVICE_URL`; the administrator enters it once when configuring the Toolbox. Business Agents and users do not need to know this URL; they call the OpenBKN Execution Factory REST Proxy. See the [BKN Foundry ToolBox REST proxy documentation](https://openbkn-ai.github.io/bkn-foundry/versions/v0.1.3/execution-factory/toolbox.html).
+
 ### Action Dataset tables
 
 Agent mode can create and verify the tables and bind the object types in one step:

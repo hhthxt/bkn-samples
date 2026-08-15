@@ -98,4 +98,4 @@ We followed the correct path and attempted a real call in one managed Interactio
 dial tcp: lookup host.docker.internal on 10.96.0.10:53: no such host
 ```
 
-Conclusion: the function Toolbox, request contract, and Agent orchestration path are wired correctly; the current blocker is that the function service URL cannot be resolved from the POC platform container. Configure the Toolbox with a POC-reachable HTTPS/service address or deploy the function service into a network reachable by POC. Local reachability of `host.docker.internal` is not evidence of POC reachability.
+Conclusion: the Agent → OpenBKN Execution Factory REST Proxy → Function Toolbox path, request contract, and Agent orchestration are wired correctly. The blocker is downstream forwarding: the Toolbox `service_url` cannot be resolved from the POC platform container. An administrator must configure a POC-reachable HTTPS/service address or deploy the function service into a network reachable by POC; the Agent and business user do not need to know that backend address.

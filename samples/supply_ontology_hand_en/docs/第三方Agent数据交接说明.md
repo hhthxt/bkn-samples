@@ -44,12 +44,12 @@ The Agent already retains `conversation_id` and `interaction_id`; no second pers
 find_skills / get_skill_content
 → query Context Loader once and retain receipts
 → Agent assembles resolved_context
-→ backward_plan(resolved_context, bkn_context, parameters)
+→ OpenBKN Toolbox REST Proxy(backward_plan, resolved_context + parameters)
 → Agent renders the Skill-defined report
 → propose an Action when needed and wait for human approval
 ```
 
-The Skill does not query, the function does not query, and the Agent must not recalculate outside the snapshot or fabricate evidence. The function Toolbox is callable; do not confuse the Context Loader MCP catalog with the Toolbox catalog. S1 should submit `resolved_context` and business parameters through the OpenBKN Toolbox Tool interface, while `execute_skill` is reserved for script-based Skills.
+The Skill does not query, the function does not query, and the Agent must not recalculate outside the snapshot or fabricate evidence. The function Toolbox is callable; do not confuse the Context Loader MCP catalog with the Toolbox catalog. S1 should submit `resolved_context` and business parameters through the OpenBKN Execution Factory REST Proxy, while `execute_skill` is reserved for script-based Skills. The Agent does not need to know the backend `FUNCTION_SERVICE_URL`.
 
 ## `resolved_context` 形状
 

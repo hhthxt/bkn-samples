@@ -31,7 +31,7 @@
 
 S1 属于编排型 Skill，不强制使用 `execute_skill`。`execute_skill` 仅适用于 Skill 明确声明了可执行 `entry_shell` 的脚本型 Skill。编排型 Skill 通过 `find_skills` / `get_skill_content` 获取契约，再由第三方 Agent 按上述流程执行。
 
-POC 已支持函数 Toolbox 调用；需要区分 Context Loader 的 MCP 工具目录和 OpenBKN Toolbox Tool 接口。第三方 Agent 应在保留 Interaction 上下文的前提下，通过 Toolbox Tool 接口提交 `resolved_context` 与业务参数。`execute_skill` 只用于有明确 `entry_shell` 的脚本型 Skill，不作为 S1 的函数调用入口。
+POC 已支持函数 Toolbox 调用；需要区分 Context Loader 的 MCP 工具目录和 OpenBKN Execution Factory REST Proxy。第三方 Agent 应在保留 Interaction 上下文的前提下，通过 `/api/agent-operator-integration/v1/tool-box/{box_id}/proxy/{tool_id}` 提交 `resolved_context` 与业务参数。Agent 不需要知道 OpenAPI Toolbox 后端的 `FUNCTION_SERVICE_URL`；该地址由管理员配置。`execute_skill` 只用于有明确 `entry_shell` 的脚本型 Skill，不作为 S1 的函数调用入口。
 
 ## 错误与治理
 

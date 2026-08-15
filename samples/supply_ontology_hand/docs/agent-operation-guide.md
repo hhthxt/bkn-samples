@@ -71,12 +71,25 @@ Agent 不需要额外保存上下文副本：已有的 `conversation_id`、`inte
 在线闭环的关键请求关系是：
 
 ```text
-Context Loader(bkn_context)
+optional Context Loader(bkn_context)
 → resolved_context(rows + receipts)
-→ Toolbox backward_plan(bkn_context + resolved_context + parameters)
+→ OpenBKN Toolbox REST Proxy(backward_plan, request body)
 → Agent report
 ```
 
-POC 的函数 Toolbox 已支持调用；Context Loader MCP 工具目录与 Toolbox 工具目录是两套目录。Agent 应通过 OpenBKN Toolbox Tool 接口提交上面的请求；不得改用 CSV、离线 CLI 或无 Trace 的直连调用冒充在线通过。
+POC 的函数 Toolbox 已支持调用；Context Loader MCP 工具目录与 Toolbox 工具目录是两套目录。Agent 通过 OpenBKN Execution Factory 的 REST Proxy 调用工具，不需要知道 Toolbox 背后的 `FUNCTION_SERVICE_URL`。管理员只在创建/更新 OpenAPI Toolbox 时配置后端地址。
+
+生产调用入口：
+
+```http
+POST https://<openbkn-host>/api/agent-operator-integration/v1/tool-box/<box_id>/proxy/<tool_id>
+Authorization: Bearer <token-or-appkey>
+x-business-domain: bd_public
+Content-Type: application/json
+```
+
+请求体的 `body` 放函数请求；平台返回的 `status_code` 才是被调函数服务的真实状态。不得改用 CSV、离线 CLI 或绕过 Toolbox 的直连调用冒充在线通过。
+
+如果函数只需要调用计算能力、不需要额外检索，Agent 可以跳过 Context Loader，直接调用上述 REST Proxy；如果需要供应链事实证据，则先用受管 Context Loader 查询，再把 `resolved_context` 放入函数请求。
 
 完整对话样例见 [Playbook](playbook.md)。

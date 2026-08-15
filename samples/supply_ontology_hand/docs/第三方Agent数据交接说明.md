@@ -44,12 +44,12 @@ Agent 已经保存的 `conversation_id`、`interaction_id` 不需要另建存储
 find_skills / get_skill_content
 → Context Loader 查询一次并保存 receipt
 → Agent 组装 resolved_context
-→ backward_plan(resolved_context, bkn_context, parameters)
+→ OpenBKN Toolbox REST Proxy(backward_plan, resolved_context + parameters)
 → Agent 按 Skill 输出契约生成报告
 → 有需要时提出 Action，等待人工确认
 ```
 
-Skill 不自行查询、函数不自行查询，Agent 不得脱离快照重算或伪造证据。函数 Toolbox 已支持调用；不要把 Context Loader 的 MCP 工具列表当作 Toolbox 工具列表。S1 应通过 OpenBKN Toolbox Tool 接口提交 `resolved_context` 和业务参数，`execute_skill` 仅用于脚本型 Skill。
+Skill 不自行查询、函数不自行查询，Agent 不得脱离快照重算或伪造证据。函数 Toolbox 已支持调用；不要把 Context Loader 的 MCP 工具列表当作 Toolbox 工具列表。S1 应通过 OpenBKN Execution Factory REST Proxy 提交 `resolved_context` 和业务参数，`execute_skill` 仅用于脚本型 Skill。Agent 不需要知道后端 `FUNCTION_SERVICE_URL`。
 
 ## `resolved_context` 形状
 

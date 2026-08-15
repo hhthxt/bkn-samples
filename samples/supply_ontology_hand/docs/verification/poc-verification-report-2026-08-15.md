@@ -114,4 +114,4 @@ POC 已完成该补充步骤：`public.skills` Resource ID 为 `da01diljdthc73bm
 dial tcp: lookup host.docker.internal on 10.96.0.10:53: no such host
 ```
 
-结论：函数 Toolbox、请求合同和 Agent 编排路径均已走通；当前阻塞是函数服务地址对 POC 平台容器不可解析。需要把 Toolbox 的 `service_url` 改为 POC 网络可解析、可访问的 HTTPS/服务地址，或将函数服务部署到 POC 可访问的运行环境。不能把 `host.docker.internal` 在本地可用等同于 POC 平台可用。
+结论：Agent → OpenBKN Execution Factory REST Proxy → Function Toolbox 的调用路径、请求合同和 Agent 编排均已走通；当前阻塞在 Proxy 下游转发到函数服务时，Toolbox 的 `service_url` 对 POC 平台容器不可解析。需要管理员把 Toolbox 后端地址改为 POC 网络可解析、可访问的 HTTPS/服务地址，或将函数服务部署到 POC 可访问的运行环境。Agent 和业务用户不需要知道该后端地址。

@@ -71,10 +71,23 @@ No additional context store is required: pass the existing `conversation_id` and
 The online call relationship is:
 
 ```text
-Context Loader(bkn_context)
+optional Context Loader(bkn_context)
 → resolved_context(rows + receipts)
-→ Toolbox backward_plan(bkn_context + resolved_context + parameters)
+→ OpenBKN Toolbox REST Proxy(backward_plan, request body)
 → Agent report
 ```
 
-The POC function Toolbox is callable; the Context Loader MCP catalog and the Toolbox catalog are separate. The Agent should submit the request above through the OpenBKN Toolbox Tool interface. Do not use CSV, offline CLI, or an untraced direct call as a substitute for online success.
+The POC function Toolbox is callable; the Context Loader MCP catalog and the Toolbox catalog are separate. The Agent calls the tool through the OpenBKN Execution Factory REST Proxy and does not need to know the Toolbox's backend `FUNCTION_SERVICE_URL`. The administrator configures that backend only when creating/updating the OpenAPI Toolbox.
+
+Production call endpoint:
+
+```http
+POST https://<openbkn-host>/api/agent-operator-integration/v1/tool-box/<box_id>/proxy/<tool_id>
+Authorization: Bearer <token-or-appkey>
+x-business-domain: bd_public
+Content-Type: application/json
+```
+
+Put the function request in the envelope's `body`; use the returned `status_code` as the upstream function status. Do not use CSV, offline CLI, or an untraced direct call as a substitute for online success.
+
+When a function only needs computation and no additional evidence retrieval, the Agent may skip Context Loader and call the REST Proxy directly. When supply-chain facts are required, query through the managed Context Loader first and put the resulting `resolved_context` into the function request.

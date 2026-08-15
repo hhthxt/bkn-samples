@@ -42,6 +42,15 @@ python3 verify_sample.py --config config.poc.yaml --kn-id supply_ontology_hand
 
 函数服务地址不能硬编码。启动函数服务后，由部署者将 OpenBKN/POC 网络可访问的 `FUNCTION_SERVICE_URL` 注入 Toolbox 和 OpenAPI；`host.docker.internal` 仅是部分本地 Docker 环境的别名。服务进程必须持续运行，不能在上传 OpenAPI 后立即关闭。
 
+本 sample 已提供可自托管的函数服务容器。开发机或客户自己的 Docker 主机上执行：
+
+```bash
+docker compose -f docker-compose.function.yaml up -d --build
+curl http://127.0.0.1:8765/health
+```
+
+本机验证通过后，不能把 `http://127.0.0.1:8765` 填入远程 POC Toolbox。应把同一容器部署到客户/伙伴可控制且 OpenBKN 能访问的运行环境，使用该环境返回的 HTTPS 地址作为 `FUNCTION_SERVICE_URL`，只由管理员在 Toolbox 配置时填写一次。业务 Agent 和业务用户不需要知道这个地址；他们调用的是 OpenBKN Execution Factory 的 REST Proxy。参考 [BKN Foundry ToolBox REST proxy](https://openbkn-ai.github.io/bkn-foundry/versions/v0.1.3/execution-factory/toolbox.html)。
+
 ### Action Dataset 建表
 
 Agent 模式可用以下命令一次完成幂等建表、三张表验收和对象类绑定；密码只在提示时输入，不写入配置：
