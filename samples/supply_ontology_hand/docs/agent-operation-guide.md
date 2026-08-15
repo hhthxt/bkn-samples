@@ -41,7 +41,7 @@ python3 tools/bootstrap_action_layer.py \
 
 - Toolbox 名称只能包含中文、英文字母、数字和下划线；不要使用 `-`、空格或其他标点。例如使用 `供应链计算函数工具箱P0`，不要使用 `供应链计算函数工具箱-P0`。
 - 每次创建前先用 `openbkn toolbox list` 按名称确认是否已经存在。若命令出现连接超时，不要立即重复创建；先执行 `openbkn auth status`，再查询列表确认平台是否已创建成功。
-- 函数服务必须先启动并保持运行，服务地址使用 `http://host.docker.internal:8765`；OpenBKN 平台能访问该地址，不等于本机浏览器能访问该地址。
+- 函数服务必须先启动并保持运行；服务地址通过 `FUNCTION_SERVICE_URL` 配置，并且必须从 OpenBKN/POC 网络可解析、可访问。本机浏览器能访问不等于平台容器能访问。
 - OpenAPI 上传后工具默认可能是 `disabled`；必须记录返回的 `tool_id`，执行 `openbkn tool enable --toolbox <box-id> <tool-id...>`，再查询 Toolbox 确认全部为 `enabled`。
 - Agent 模式由 `bootstrap_action_layer.py` 一次完成幂等建表、三张表验收和对象类绑定；密码只在本次交互中使用，不写入 `config.poc.yaml`。
 - Skill Registry 也是数据库表：先运行 `setup_skill_dataset.py` 建表并从当前环境已发布 Skill 生成/幂等更新 `public.skills`，再重新 Discover，最后用 `bind_skill_dataset.py` 将对象类 ID `skills` 绑定到 Resource。不能只注册 Skill API 而跳过 Dataset 绑定。

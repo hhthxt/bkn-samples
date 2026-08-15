@@ -41,7 +41,7 @@ python3 tools/bootstrap_action_layer.py \
 
 - Toolbox names may contain only Chinese characters, letters, digits, and underscores. Do not use hyphens, spaces, or other punctuation; use `SupplyChainFunctionToolsP0`, not `SupplyChainFunctionTools-P0`.
 - Before creating a Toolbox, check `openbkn toolbox list` by name. If the POC request times out, run `openbkn auth status` and list Toolboxes before retrying, so a successful create is not duplicated.
-- Keep the function service running at `http://host.docker.internal:8765`. Reachability from the local browser does not prove reachability from the OpenBKN platform container.
+- Keep the function service running and configure it through `FUNCTION_SERVICE_URL`. The URL must be resolvable and reachable from the OpenBKN/POC network; local browser reachability does not prove platform-container reachability.
 - Tools uploaded from OpenAPI may default to `disabled`; capture the returned `tool_id` values, run `openbkn tool enable --toolbox <box-id> <tool-id...>`, and verify that every tool is `enabled`.
 - Agent mode uses `bootstrap_action_layer.py` to apply idempotent DDL, verify the three tables, and bind object types in one flow. The password is used only during the prompt and is not written to `config.poc.yaml`.
 - The Skill Registry is also a database table: run `setup_skill_dataset.py` to create it and upsert published Skills from the current environment, Discover the Catalog again, then bind object class ID `skills` with `bind_skill_dataset.py`. Skill API registration alone is not sufficient for `find_skills`.
