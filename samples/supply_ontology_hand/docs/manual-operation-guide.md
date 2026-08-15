@@ -2,6 +2,16 @@
 
 人工模式由“界面操作 + 脚本操作”组成，不通过 Agent 对话完成业务判断。
 
+## 第 1 步：人工导入数据库表（必做）
+
+数据库表导入是线上体验的前置环节，必须由操作者使用数据库连接信息完成，不能只在 OpenBKN 界面导入 KN JSON。执行：
+
+```bash
+python3 tools/load_sample_data.py --interactive --table-prefix hand_
+```
+
+依次输入 PostgreSQL Host、端口、数据库名、用户名和密码。连接测试成功后输入 `yes`，脚本会创建 `hand_` 前缀表并保留原有业务表。
+
 ## 界面操作
 
 1. 登录 OpenBKN 控制台。

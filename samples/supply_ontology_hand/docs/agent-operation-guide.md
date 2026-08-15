@@ -4,6 +4,16 @@
 
 Agent 不依赖网页界面，通过 OpenBKN API、`openbkn` CLI 和 sample 脚本完成一次性导入、绑定、能力验证和供应承诺判断。
 
+## 第 1 步：人工导入数据库表（Agent 前置条件）
+
+这一步必须由部署/POC 操作者完成，因为它需要数据库连接信息和密码；Agent 不代替操作者登录数据库。请在 sample 根目录执行：
+
+```bash
+python3 tools/load_sample_data.py --interactive --table-prefix hand_
+```
+
+按提示输入 PostgreSQL Host、端口、数据库名、用户名和密码；连接测试成功后输入 `yes` 才写入。脚本会创建 `hand_` 前缀表，不覆盖原表。完成后，Agent 才从 Catalog Discover 开始接管。
+
 ## 操作入口
 
 ```text
@@ -15,9 +25,8 @@ Agent → OpenBKN API / openbkn CLI → KN、Resource、Skill、Function、Actio
 ```bash
 openbkn auth status
 python3 tools/import_kn.py --json kn/supply_ontology_hand.json --dry-run
-python3 tools/load_sample_data.py --config tools/config.yaml
-python3 tools/load_sample_data.py --interactive --table-prefix hand_
 python3 tools/import_kn.py --json kn/supply_ontology_hand.json --resolve-embedding
+openbkn --json vega catalog discover <catalog_id> --wait
 python3 tools/bind_kn_resources.py --config tools/config.yaml --kn-id supply_ontology_hand
 python3 tools/register_skills.py --dry-run
 python3 tools/setup_action_datasets.py --engine postgres

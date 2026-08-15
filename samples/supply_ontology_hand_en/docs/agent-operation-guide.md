@@ -4,6 +4,16 @@
 
 The Agent does not depend on the web UI. It uses OpenBKN APIs, the `openbkn` CLI, and sample scripts to import, bind, verify capabilities, and answer a fulfillment commitment question.
 
+## Step 1: Human database-table import (Agent prerequisite)
+
+This step must be performed by the deployment/POC operator because it requires database connection details and a password. From the sample root, run:
+
+```bash
+python3 tools/load_sample_data.py --interactive --table-prefix hand_
+```
+
+Enter the PostgreSQL host, port, database, username, and password. The script tests the connection and writes only after you type `yes`; destination tables use the `hand_` prefix. Agent automation starts after Catalog Discover.
+
 ## Operation entry point
 
 ```text
@@ -15,9 +25,8 @@ Recommended entry sequence:
 ```bash
 openbkn auth status
 python3 tools/import_kn.py --json kn/supply_ontology_hand_en.json --dry-run
-python3 tools/load_sample_data.py --config tools/config.yaml
-python3 tools/load_sample_data.py --interactive --table-prefix hand_
 python3 tools/import_kn.py --json kn/supply_ontology_hand_en.json --resolve-embedding
+openbkn --json vega catalog discover <catalog_id> --wait
 python3 tools/bind_kn_resources.py --config tools/config.yaml --kn-id supply_ontology_hand_en
 python3 tools/register_skills.py --dry-run
 python3 tools/setup_action_datasets.py --engine postgres
