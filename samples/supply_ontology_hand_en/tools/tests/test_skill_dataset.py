@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from setup_skill_dataset import expected_tables, prompt_database_name, seed_rows
+from setup_skill_dataset import expected_tables, load_skill_entries, prompt_database_name, seed_rows
 
 
 def test_skill_registry_has_idempotent_table_and_required_columns():
@@ -30,3 +30,11 @@ def test_seed_rows_are_dataset_records_for_published_skills():
 def test_poc_database_name_has_safe_default(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda _: "")
     assert prompt_database_name() == "supply_ontology_hand_poc"
+
+
+def test_load_skill_entries_accepts_cli_data_and_keeps_published_only():
+    payload = {"total": 2, "data": [
+        {"skill_id": "s1", "name": "one", "description": "d", "status": "published"},
+        {"skill_id": "s2", "name": "two", "description": "d", "status": "unpublish"},
+    ]}
+    assert load_skill_entries(payload) == [payload["data"][0]]

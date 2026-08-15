@@ -65,10 +65,17 @@ def upsert_rows(connection, rows: list[dict], schema: str = "public") -> int:
     return len(rows)
 
 
-def load_published_skills() -> list[dict]:
+def load_published_skills(kn_id: str) -> list[dict]:
     result = subprocess.run(["openbkn", "--json", "skill", "list"], check=True, capture_output=True, text=True)
-    payload = json.loads(result.stdout)
-    return payload.get("entries", payload if isinstance(payload, list) else [])
+    return load_skill_entries(json.loads(result.stdout), kn_id=kn_id)
+
+
+def load_skill_entries(payload: dict | list, kn_id: str | None = None) -> list[dict]:
+    entries = payload if isinstance(payload, list) else (payload.get("entries") or payload.get("data") or [])
+    base_kn_id = kn_id.removesuffix("_en") if kn_id else None
+    return [entry for entry in entries
+            if str(entry.get("status") or "published") == "published"
+            and (not base_kn_id or base_kn_id in f"{entry.get('name', '')} {entry.get('description', '')}")]
 
 
 def interactive_connection():
@@ -99,7 +106,7 @@ def main() -> None:
     connection = interactive_connection()
     try:
         print(json.dumps(apply_ddl(connection, schema=args.schema), ensure_ascii=False))
-        rows = seed_rows(load_published_skills(), kn_id=args.kn_id)
+        rows = seed_rows(load_published_skills(args.kn_id), kn_id=args.kn_id)
         print(json.dumps({"seeded": upsert_rows(connection, rows, schema=args.schema), "kn_id": args.kn_id}, ensure_ascii=False))
     finally:
         connection.close()
