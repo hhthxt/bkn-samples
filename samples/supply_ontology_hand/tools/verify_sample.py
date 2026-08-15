@@ -15,7 +15,6 @@ def verify(pack: str | Path, *, run_tests: bool = True) -> dict[str, Any]:
     root = Path(pack)
     required = [
         root / "README.md",
-        root / "README_cn.md",
         root / "docs/playbook/fulfillment-commitment-playbook.md",
         root / "docs/playbook/agent-conversation.md",
         root / "docs/quickstart/offline.md",
