@@ -52,6 +52,9 @@ After loading the tables, use the same connection details to create the dedicate
 python3 tools/setup_catalog.py --interactive --table-prefix hand_ --write-config
 ```
 
+Interactive mode does not write the database password. It writes the credential-free
+follow-up config to `tools/config.poc.yaml`; use that file for binding.
+
 This defaults to `Supply_Ontology_Hand_POC`, tests the connection, creates or reuses that dedicated Catalog, runs Discover, and verifies the 12 `hand_` tables. Do not configure `RT_Supply_Data` for this sample.
 
 Do not overwrite existing business tables. Isolate this sample with a prefix:
@@ -68,7 +71,7 @@ After upload, verify resources such as `hand_erp_material`, `hand_erp_mds_foreca
 
 ```bash
 python3 tools/bind_kn_resources.py \
-  --config tools/config.yaml \
+  --config tools/config.poc.yaml \
   --mapping tools/mapping/object_table_map.yaml
 python3 tools/power_layer.py create --kn-id supply_ontology_hand_en
 ```

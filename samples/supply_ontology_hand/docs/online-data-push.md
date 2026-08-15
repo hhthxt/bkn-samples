@@ -52,6 +52,10 @@ python3 tools/load_sample_data.py --interactive --create-database --table-prefix
 python3 tools/setup_catalog.py --interactive --table-prefix hand_ --write-config
 ```
 
+交互模式不会把数据库密码写入配置，而是将后续绑定所需的无密码配置写入
+`tools/config.poc.yaml`。如果当前目录没有 `config.yaml`，不会影响 Catalog
+创建或扫描；后续绑定必须使用这个 `config.poc.yaml`。
+
 该命令默认使用 `Supply_Ontology_Hand_POC`，会测试连接、创建/复用同名新 Catalog、Discover，并核对 12 张 `hand_` 表。不要把 `RT_Supply_Data` 填入配置。
 
 不要把现有业务表直接覆盖。用前缀隔离本 sample：
@@ -68,7 +72,7 @@ openbkn --json bkn create-from-csv <catalog_id> \
 
 ```bash
 python3 tools/bind_kn_resources.py \
-  --config tools/config.yaml \
+  --config tools/config.poc.yaml \
   --mapping tools/mapping/object_table_map.yaml
 python3 tools/power_layer.py create --kn-id supply_ontology_hand
 ```

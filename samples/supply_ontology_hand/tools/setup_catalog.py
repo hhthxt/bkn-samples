@@ -254,6 +254,25 @@ def write_catalog_id_to_config(config_path: Path, catalog_id: str) -> None:
     config_path.write_text(updated, encoding="utf-8")
 
 
+def write_interactive_config(catalog_id: str, catalog_name: str, table_prefix: str) -> Path:
+    """Write a credential-free config for later bind steps."""
+    path = _SCRIPT_DIR / "config.poc.yaml"
+    path.write_text(
+        "openbkn:\n"
+        f"  kn_id: supply_ontology_hand\n"
+        f"  kn_name: {catalog_name}\n"
+        "vega:\n"
+        f"  catalog_id: {catalog_id}\n"
+        f"  catalog_name: {catalog_name}\n"
+        "database:\n"
+        "  schema: public\n"
+        "load:\n"
+        f"  table_prefix: {table_prefix}\n",
+        encoding="utf-8",
+    )
+    return path
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Setup Vega catalog and discover sample tables (step 4)")
     parser.add_argument("--config", default="config.yaml", help="Path to config YAML")
@@ -299,8 +318,14 @@ def main(argv: list[str] | None = None) -> int:
             table_prefix=table_prefix,
         )
         if args.write_config and report.get("catalog_id") and not args.dry_run:
-            write_catalog_id_to_config(config_path, report["catalog_id"])
-            report["config_updated"] = str(config_path)
+            if args.interactive:
+                path = write_interactive_config(
+                    report["catalog_id"], config["vega"]["catalog_name"], table_prefix
+                )
+                report["config_updated"] = str(path)
+            else:
+                write_catalog_id_to_config(config_path, report["catalog_id"])
+                report["config_updated"] = str(config_path)
 
         print(json.dumps(report, ensure_ascii=False, indent=2))
         if args.dry_run:

@@ -27,7 +27,7 @@ openbkn auth status
 python3 tools/import_kn.py --json kn/supply_ontology_hand.json --dry-run
 python3 tools/setup_catalog.py --interactive --table-prefix hand_ --write-config
 python3 tools/import_kn.py --json kn/supply_ontology_hand.json --resolve-embedding
-python3 tools/bind_kn_resources.py --config tools/config.yaml --kn-id supply_ontology_hand --table-prefix hand_
+python3 tools/bind_kn_resources.py --config tools/config.poc.yaml --kn-id supply_ontology_hand --table-prefix hand_
 python3 tools/register_skills.py --dry-run
 python3 tools/setup_action_datasets.py --engine postgres
 python3 tools/bind_action_datasets.py --mapping tools/mapping/action_dataset_map.yaml

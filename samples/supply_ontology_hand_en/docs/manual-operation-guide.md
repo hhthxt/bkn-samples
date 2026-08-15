@@ -28,8 +28,8 @@ cd tools
 python3 load_sample_data.py --config config.yaml
 python3 import_kn.py --json ../kn/supply_ontology_hand_en.json
 python3 setup_catalog.py --interactive --table-prefix hand_ --write-config
-python3 bind_kn_resources.py --config config.yaml --kn-id supply_ontology_hand_en --table-prefix hand_
-python3 verify_sample.py --config config.yaml --kn-id supply_ontology_hand_en
+python3 bind_kn_resources.py --config config.poc.yaml --kn-id supply_ontology_hand_en --table-prefix hand_
+python3 verify_sample.py --config config.poc.yaml --kn-id supply_ontology_hand_en
 ```
 
 Then follow the Action Dataset, Skill registration, and function-service instructions. Run every write command with `--dry-run` first.
