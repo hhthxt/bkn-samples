@@ -8,6 +8,16 @@
 
 ## Agent/API 模式
 
+物理 Catalog 不是文件上传容器。它只是已连接的数据源的目录；正确链路是：先把数据写入数据库，再让 Catalog Discover 扫描出表和资源。
+
+```text
+PostgreSQL/MySQL 数据库（写入 sample 表）
+  → 物理 Catalog（connector）
+  → discover
+  → Vega resources
+  → KN object_type.data_source
+```
+
 先检查每个 CSV 的列数一致，避免平台数据流中途失败：
 
 ```bash
@@ -24,7 +34,9 @@ print('CSV shape check passed')
 PY
 ```
 
-使用平台可写入的物理 Catalog；不要把现有业务表直接覆盖。用前缀隔离本 sample：
+`create-from-csv` 只是平台提供的便捷数据流入口，不是物理 Catalog 的基本属性。若目标环境已启用该数据流，可使用它；否则应先通过数据库连接（或平台允许的数据库导入流程）创建带前缀的表，再运行 Catalog discover。
+
+不要把现有业务表直接覆盖。用前缀隔离本 sample：
 
 ```bash
 openbkn --json bkn create-from-csv <catalog_id> \
@@ -47,7 +59,7 @@ Embedding 需在导入 KN 时使用 `--resolve-embedding`；数据上传和向�
 
 ## 失败排查
 
-- `HTTP 404`：当前 Catalog 不是可写入的数据流目标，或该环境未启用 CSV 数据流。换用平台明确标记为可写入的物理 Catalog，或先把 CSV 灌入一个 POC 可访问的 PostgreSQL/MySQL，再运行 `setup_catalog.py` 扫描。
+- `HTTP 404`：通常不是物理 Catalog 无效，而是当前环境没有启用 CSV 数据流接口。先把 CSV 灌入 POC 可访问的 PostgreSQL/MySQL，再让物理 Catalog discover；不要反复重试 `create-from-csv`。
 - `Invalid Record Length`：CSV 某行列数与表头不一致；先运行上面的 shape check。不要直接重试，否则可能留下部分表。
 - 资源存在但绑定失败：检查资源是否在目标 Catalog、表名是否包含 `hand_` 前缀，以及对象类的 `data_source.resource.id` 是否来自当前环境。
 - 指标创建提示 `resource id is required`：先完成对象类资源绑定，再创建指标。

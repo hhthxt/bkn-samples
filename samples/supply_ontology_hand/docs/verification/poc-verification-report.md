@@ -4,6 +4,8 @@
 环境：`https://poc.openbkn.ai`  
 模式：Agent API / CLI
 
+已确认 POC 的 `RT_Supply_Data` 是健康的物理 PostgreSQL Catalog，连接到 `Supply_Data` 数据库；当前问题不是 Catalog 没有连接，而是 sample CSV 尚未写入该数据库，且 CSV dataflow 接口返回 HTTP 404。
+
 ## 已通过
 
 - 中文 KN `supply_ontology_hand` 导入并回读成功。

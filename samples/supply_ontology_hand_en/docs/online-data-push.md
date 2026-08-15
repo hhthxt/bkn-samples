@@ -8,6 +8,16 @@ Validate CSV → choose a writable physical Catalog → upload with a prefix →
 
 ## Agent/API mode
 
+A physical Catalog is not a file-upload container. It is a directory over a connected data source. The correct chain is: write the data into the database first, then let Catalog Discover scan the tables and create resources.
+
+```text
+PostgreSQL/MySQL database (write sample tables)
+  → physical Catalog (connector)
+  → discover
+  → Vega resources
+  → KN object_type.data_source
+```
+
 Check that every CSV has a consistent column count before upload:
 
 ```bash
@@ -24,7 +34,9 @@ print('CSV shape check passed')
 PY
 ```
 
-Use a writable physical Catalog and do not overwrite existing business tables. Isolate this sample with a prefix:
+`create-from-csv` is only a convenience dataflow entry point; writability is not an inherent property of a physical Catalog. If the target environment enables this dataflow, use it. Otherwise, create prefixed tables through the database connection or an approved database import flow, then run Catalog Discover.
+
+Do not overwrite existing business tables. Isolate this sample with a prefix:
 
 ```bash
 openbkn --json bkn create-from-csv <catalog_id> \
@@ -47,7 +59,7 @@ Resolve the target embedding with `--resolve-embedding` during KN import. Data u
 
 ## Troubleshooting
 
-- `HTTP 404`: the Catalog is not a writable dataflow target, or CSV dataflow is disabled in the environment. Use a physical Catalog explicitly marked writable, or load the CSV into a POC-accessible PostgreSQL/MySQL and scan it with `setup_catalog.py`.
+- `HTTP 404`: this usually means the CSV dataflow endpoint is not enabled; it does not mean the physical Catalog is invalid. Load the CSV into a POC-accessible PostgreSQL/MySQL, then run Catalog Discover instead of retrying `create-from-csv`.
 - `Invalid Record Length`: a CSV row has a different number of columns from the header. Run the shape check first; do not blindly retry because partial tables may remain.
 - Resource exists but binding fails: verify the resource belongs to the target Catalog, the `hand_` prefix is present, and the object type uses the current environment resource ID.
 - Metric creation says `resource id is required`: bind object-type resources before registering metrics.
