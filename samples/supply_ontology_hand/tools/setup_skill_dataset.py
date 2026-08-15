@@ -86,10 +86,14 @@ def interactive_connection():
     import psycopg
     host = input("数据库 Host: ").strip()
     port = int(input("端口 [5432]: ") or "5432")
-    database = input("数据库名: ").strip()
+    database = prompt_database_name()
     user = input("用户名: ").strip()
     password = getpass.getpass("密码（输入时不显示）: ")
     return psycopg.connect(host=host, port=port, dbname=database, user=user, password=password)
+
+
+def prompt_database_name() -> str:
+    return input("数据库名 [supply_ontology_hand_poc]: ").strip() or "supply_ontology_hand_poc"
 
 
 def main() -> None:
