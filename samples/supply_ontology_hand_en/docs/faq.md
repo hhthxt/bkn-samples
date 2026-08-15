@@ -63,7 +63,7 @@ Agent mode now uses `bootstrap_action_layer.py --interactive --apply` to execute
 
 ## Q11: Why is a function Toolbox created but not callable?
 
-Keep `fn_service` running on port 8765 and verify DNS/TCP reachability of the Toolbox `service_url` from the POC platform network. `host.docker.internal` works only when that network provides the mapping; local browser reachability alone is insufficient.
+First verify the service host itself: run `python3 tools/start_function_service.py --host 0.0.0.0 --port 8765`, then request `curl http://127.0.0.1:8765/health`. Next verify DNS/TCP reachability of the Toolbox `service_url` from the POC platform network. `host.docker.internal` works only when that network provides the mapping; local browser reachability alone is insufficient. For remote POC, deploy the same container to a reachable runtime and configure its HTTPS address as the Toolbox `service_url`.
 
 ## Q12: The OpenAPI upload succeeded but the tools cannot be called
 

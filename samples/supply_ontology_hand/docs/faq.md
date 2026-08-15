@@ -63,7 +63,7 @@ POC 的 Toolbox 名称只允许中文、英文字母、数字和下划线。不�
 
 ## Q11：函数 Toolbox 创建成功但调用失败怎么办？
 
-保持 `fn_service` 进程运行，确认服务监听 8765 端口，并从 POC 平台网络验证 Toolbox `service_url` 的 DNS 和 TCP 可达性。`host.docker.internal` 只有在平台网络提供对应 DNS 映射时才有效；本机能打开服务地址，不代表平台容器一定能访问。
+先在函数服务所在主机验证服务本身：`python3 tools/start_function_service.py --host 0.0.0.0 --port 8765`，再请求 `curl http://127.0.0.1:8765/health`。随后必须从 POC 平台网络验证 Toolbox `service_url` 的 DNS 和 TCP 可达性。`host.docker.internal` 只有在平台网络提供对应 DNS 映射时才有效；本机能打开服务地址，不代表平台容器一定能访问。远程 POC 应部署同一容器到可访问的运行环境，并把该 HTTPS 地址配置为 Toolbox `service_url`。
 
 ## Q12：OpenAPI 上传成功但工具不能调用怎么办？
 
