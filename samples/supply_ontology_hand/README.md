@@ -10,7 +10,7 @@
 
 ## Documentation
 
-[供应链本体 Handbook HTML](./docs/handbook.html) · [Agent 操作](./docs/agent-operation-guide.md) · [手工操作](./docs/manual-operation-guide.md) · [第三方 FAQ](./docs/faq.md) · [Playbook](./docs/playbook.md) · [QA 测试集](./docs/qa-eval-set.yaml)
+[供应链本体 Handbook HTML](./docs/handbook.html) · [Agent 操作](./docs/agent-operation-guide.md) · [手工操作](./docs/manual-operation-guide.md) · [线上数据推送](./docs/online-data-push.md) · [第三方 FAQ](./docs/faq.md) · [Playbook](./docs/playbook.md) · [QA 测试集](./docs/qa-eval-set.yaml)
 
 Canonical design is **Chinese** (this sample’s KN model and CSVs are Chinese):
 

@@ -291,11 +291,12 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Bind KN object types to catalog resources")
     parser.add_argument("--config", required=True, help="Path to config.yaml")
     parser.add_argument("--dry-run", action="store_true", help="Print OT→table→resource_id only")
+    parser.add_argument("--mapping", default=str(_DEFAULT_MAP), help="Path to OT→table mapping YAML")
     args = parser.parse_args(argv)
 
     try:
         config = load_config(Path(args.config))
-        mapping = load_mapping()
+        mapping = load_mapping(Path(args.mapping))
         dry_run = args.dry_run or bool((config.get("bind") or {}).get("dry_run"))
         report = run_bind(config, mapping, dry_run=dry_run)
         if dry_run:
