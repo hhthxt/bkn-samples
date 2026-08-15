@@ -53,6 +53,34 @@ def snapshot_id_from_digest(input_digest: str) -> str:
     return f"{SNAPSHOT_ID_PREFIX}{input_digest[:SNAPSHOT_ID_DIGEST_CHARS]}"
 
 
+def _normalize_bom_usage(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Accept either the canonical usage or ERP numerator/denominator fields.
+
+    The sample CSV already contains ``standard_usage``.  A freshly scanned
+    OpenBKN catalog may instead expose the two physical ERP columns only.  The
+    normalization belongs at the context boundary so every pure function sees
+    one consistent BOM contract without changing the customer's source table.
+    """
+    normalized: list[dict[str, Any]] = []
+    for source in rows:
+        row = dict(source)
+        standard = row.get("standard_usage")
+        if standard in (None, ""):
+            numerator = row.get("usage_numerator")
+            denominator = row.get("usage_denominator")
+            try:
+                if numerator not in (None, ""):
+                    base = float(denominator) if denominator not in (None, "") else 1.0
+                    if base != 0:
+                        row["standard_usage"] = float(numerator) / base
+            except (TypeError, ValueError):
+                # Keep the original row: function-level defaults and validation
+                # retain their existing behavior for malformed source values.
+                pass
+        normalized.append(row)
+    return normalized
+
+
 class ResolvedContextAssembler:
     def __init__(
         self,
@@ -91,6 +119,8 @@ class ResolvedContextAssembler:
             raise SnapshotIncomplete(f"缺少必需数据集: {', '.join(missing)}")
 
         loaded_rows = {name: ctx.rows[name] for name in datasets}
+        if "bom" in loaded_rows:
+            loaded_rows["bom"] = _normalize_bom_usage(loaded_rows["bom"])
 
         if source == SOURCE_OPENBKN:
             self._check_receipts(ctx, loaded_rows)

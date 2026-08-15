@@ -53,11 +53,17 @@ python3 power_layer.py --dry-run all --kn-id supply_ontology_hand
 python3 power_layer.py all --kn-id supply_ontology_hand
 ```
 
+默认函数使用 OpenBKN 原生 Function Runtime；在确认 Toolbox 名称后可重复执行：
+
+```bash
+python3 register_native_function_toolbox.py --apply
+```
+
 ### 函数 Toolbox 与超时处理
 
 函数服务启动后，Toolbox 名称只能使用中文、字母、数字和下划线，不能含连字符、空格或其他标点。创建前先在 UI 或 `openbkn toolbox list` 中确认同名 Toolbox；如果 POC 返回连接超时，先检查 `openbkn auth status` 和 Toolbox 列表，再决定是否重试，避免重复创建。
 
-函数服务地址不能硬编码。启动函数服务后，由部署者将 OpenBKN/POC 网络可访问的 `FUNCTION_SERVICE_URL` 注入 Toolbox 和 OpenAPI；`host.docker.internal` 仅是部分本地 Docker 环境的别名。服务进程必须持续运行，不能在上传 OpenAPI 后立即关闭。
+默认样例使用 OpenBKN 内建的 `metadata_type=function` 运行时，不需要 `FUNCTION_SERVICE_URL`、Docker、`host.docker.internal` 或独立函数服务器。操作者只需已登录 OpenBKN；脚本会创建或更新 `供应链原生计算函数` Toolbox。外部 OpenAPI/Docker 服务仅用于客户自行扩展，不是体验样例的前置条件。
 
 本 sample 已提供可自托管的函数服务容器。开发机或客户自己的 Docker 主机上执行：
 

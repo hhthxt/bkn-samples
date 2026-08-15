@@ -63,6 +63,12 @@ POC 的 Toolbox 名称只允许中文、英文字母、数字和下划线。不�
 
 ## Q11：函数 Toolbox 创建成功但调用失败怎么办？
 
+先确认是否使用默认的原生 Function Toolbox：执行 `python3 tools/register_native_function_toolbox.py --apply`。该路径不需要 `FUNCTION_SERVICE_URL`；函数由 OpenBKN 内建运行时执行。
+
+如果调用带有完整 BOM、库存和采购上下文而 POC 返回 `SandboxControlPlaneFailed` 或无函数级响应，先将同一 `resolved_context` 序列化为 UTF-8 JSON，zlib 压缩后 base64 编码，放进 `parameters.resolved_context_compressed`，并保留所有 `bkn_receipt`。这是 POC 请求体限制的规避方式，不得改用 CSV 或去掉回执。
+
+外部 OpenAPI 扩展才需要以下排查：
+
 先在函数服务所在主机验证服务本身：`python3 tools/start_function_service.py --host 0.0.0.0 --port 8765`，再请求 `curl http://127.0.0.1:8765/health`。随后必须从 POC 平台网络验证 Toolbox `service_url` 的 DNS 和 TCP 可达性。`host.docker.internal` 只有在平台网络提供对应 DNS 映射时才有效；本机能打开服务地址，不代表平台容器一定能访问。远程 POC 应部署同一容器到可访问的运行环境，并把该 HTTPS 地址配置为 Toolbox `service_url`。
 
 ## Q12：OpenAPI 上传成功但工具不能调用怎么办？

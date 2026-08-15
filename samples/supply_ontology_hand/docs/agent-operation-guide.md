@@ -41,13 +41,14 @@ python3 tools/power_layer.py all --kn-id supply_ontology_hand
 python3 tools/bootstrap_action_layer.py \
   --config tools/config.yaml \
   --interactive --apply
+python3 tools/register_native_function_toolbox.py --apply
 ```
 
 ### 平台写入前的实施约束
 
 - Toolbox 名称只能包含中文、英文字母、数字和下划线；不要使用 `-`、空格或其他标点。例如使用 `供应链计算函数工具箱P0`，不要使用 `供应链计算函数工具箱-P0`。
 - 每次创建前先用 `openbkn toolbox list` 按名称确认是否已经存在。若命令出现连接超时，不要立即重复创建；先执行 `openbkn auth status`，再查询列表确认平台是否已创建成功。
-- 函数服务必须先启动并保持运行；服务地址通过 `FUNCTION_SERVICE_URL` 配置，并且必须从 OpenBKN/POC 网络可解析、可访问。本机浏览器能访问不等于平台容器能访问。
+- 默认函数使用 OpenBKN 原生 Function Runtime；只需执行 `register_native_function_toolbox.py --apply`，不要配置 `FUNCTION_SERVICE_URL` 或 `host.docker.internal`。外部 OpenAPI 服务仅是可选扩展。
 - OpenAPI 上传后工具默认可能是 `disabled`；必须记录返回的 `tool_id`，执行 `openbkn tool enable --toolbox <box-id> <tool-id...>`，再查询 Toolbox 确认全部为 `enabled`。
 - Agent 模式由 `bootstrap_action_layer.py` 一次完成幂等建表、三张表验收和对象类绑定；密码只在本次交互中使用，不写入 `config.yaml`。
 - Skill Registry 需要两步：先用 `register_skills.py --apply` 将本包三项 Skill 注册/更新为 published，再用 `setup_skill_dataset.py` 建表并回填 `public.skills`，重新 Discover 后用 `bind_skill_dataset.py` 将小写对象类 ID `skills` 绑定到 Resource。不能只做其中一步。
@@ -72,7 +73,7 @@ python3 tools/bootstrap_action_layer.py \
 
 S1/S2/S3 是编排型 Skill。Agent 先用 `find_skills` / `get_skill_content` 读取契约，然后自己完成受管查询和函数调用；不要把 S1 作为没有业务参数的 `execute_skill` shell 命令调用。
 
-Agent 不需要额外保存上下文副本：已有的 `conversation_id`、`interaction_id` 原样放入每次调用的 `bkn_context`，已有的查询快照和 `bkn_receipt` 组装成 `resolved_context` 后直接传给 `backward_plan`。函数只计算，不查库；报告由 Agent 按 Skill 输出契约生成。
+Agent 不需要额外保存上下文副本：已有的 `conversation_id`、`interaction_id` 原样放入每次调用的 `bkn_context`，已有的查询快照和 `bkn_receipt` 组装成 `resolved_context` 后直接传给 `backward_plan`。函数只计算，不查库；报告由 Agent 按 Skill 输出契约生成。若完整上下文超过 POC 请求体阈值，使用 `resolved_context_compressed`（UTF-8 JSON 的 zlib+base64）代替 `resolved_context`；两者不可同时传入。
 
 在线闭环的关键请求关系是：
 
