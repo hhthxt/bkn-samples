@@ -43,7 +43,9 @@ def interactive_connection():
 
     host = input("数据库 Host: ").strip()
     port = int(input("端口 [5432]: ") or "5432")
-    database = input("数据库名 [supply_ontology_hand_poc]: ").strip() or "supply_ontology_hand_poc"
+    database = input("数据库名（必填）: ").strip()
+    if not database:
+        raise ValueError("数据库名不能为空；请填写本环境 sample 数据库名")
     user = input("用户名: ").strip()
     password = getpass.getpass("密码（输入时不显示）: ")
     return psycopg.connect(host=host, port=port, dbname=database, user=user, password=password)

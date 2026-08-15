@@ -97,7 +97,7 @@ metrics:
       - { id: M-FC-05, question: 382 预测是两千多，那 5 月 14 日一定能齐套吗？, reference: { answer: 不能；齐套走倒排 } }
   - name: 未关闭预测单数
     cases:
-      - { id: M-FCO-01, question: 还有多少张未关闭的预测单？, reference: { snapshot_value: 87 } }
+      - { id: M-FCO-01, question: 还有多少张未关闭的预测单？, reference: { snapshot_value: 90 } }
       - { id: M-FCO-04, question: 382-000005 还有几张未关闭预测？, reference: { snapshot_value: 6 } }
 
 functions:

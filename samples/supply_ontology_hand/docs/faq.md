@@ -73,19 +73,19 @@ POC 的 Toolbox 名称只允许中文、英文字母、数字和下划线。不�
 
 Action Dataset 首先是数据库表；对象类在 OpenBKN 中必须绑定物理 Catalog Discover 出来的 Resource。因此正确顺序是：建表 → Catalog Discover → 获取 `resource_id` → 用 `data_source.type=resource` 绑定。`bootstrap_action_layer.py` 已自动执行这四步。
 
-## Q14：为什么网页/内置 Agent 查询不到 POC 数据，但 CLI 能查到？
+## Q14：为什么网页/内置 Agent 查询不到本环境数据，但 CLI 能查到？
 
-先不要判断数据导入失败。必须先回读当前 Agent 实际使用的 `kn_id`、Catalog 和对象类 `data_source`。POC 的固定只读验证入口是已认证的 `openbkn context` CLI；如果内置连接器返回公共/旧 Resource，说明环境路由不一致，应停止业务验收并切换到 POC Context Loader。不能用旧资源的查询结果替代 POC 证据。
+先不要判断数据导入失败。必须先回读当前 Agent 实际使用的 `kn_id`、Catalog 和对象类 `data_source`。可复现的只读验证入口是已认证的 `openbkn context` CLI；如果内置连接器返回公共或旧 Resource，说明环境路由不一致，应停止业务验收并切换到当前环境的 Context Loader。不能用其他环境资源的查询结果替代本环境证据。
 
 验证命令示例：
 
 ```bash
 openbkn --json context tool-call supply_ontology_hand bkn_start_interaction \\
-  --args '{"agent_name":"supply_ontology_hand_poc_agent","question":"请验证产品 U00-000080 的预测证据。"}'
+  --args '{"agent_name":"<your_agent_name>","question":"请验证产品 U00-000080 的预测证据。"}'
 ```
 
 后续查询必须复用返回的 `conversation_id` 和 `interaction_id`，并在结束时调用 `bkn_finish_interaction`。
 
 ## Q15：数据库名和 OpenBKN 连接名称是不是一回事？
 
-不是。POC 中 PostgreSQL 数据库名是 `supply_ontology_hand_poc`，OpenBKN 物理 Catalog/连接名称是 `Supply_Ontology_Hand_POC`，Catalog ID 是 `d9vuoqtjdthc73bmpprg`。数据库脚本提示数据库名时只能填第一个值。
+不是。由部署者为本环境分别创建 PostgreSQL 数据库（如 `<sample_database>`）与 OpenBKN 物理 Catalog（如 `<sample_catalog_name>`）；Catalog ID 由平台创建后返回。数据库脚本提示数据库名时只能填数据库名，不能填 Catalog 名称或 Catalog ID。不要复制其他 POC、客户或报告中的这些值。

@@ -9,7 +9,7 @@ description: >
 # 生产计划倒排 · 齐套诊断（S1）
 
 > OpenBKN 知识类 Skill。公式以体验包 `docs/能力口径清单.md` §2 为准，本包只编排指标、Toolbox 函数和行动。  
-> 函数工具箱：`供应链计算函数工具箱`（`71600d21-c9f6-4336-bfbf-95bfb3654674`）。`tools/fn_cli.py` 仅作离线调试。
+> 函数工具箱：由本环境管理员配置；不得复制其他环境的 Toolbox ID。`tools/fn_cli.py` 仅作离线调试。
 
 ## Skill Card
 

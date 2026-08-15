@@ -296,10 +296,14 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.interactive:
             import getpass
-            catalog_name = input("New Catalog name [Supply_Ontology_Hand_POC]: ").strip() or "Supply_Ontology_Hand_POC"
+            catalog_name = input("New Catalog name（必填）: ").strip()
+            if not catalog_name:
+                raise ValueError("Catalog 名称不能为空；请填写本环境独立名称")
             host = input("PostgreSQL host: ").strip()
             port = int(input("Port [5432]: ") or "5432")
-            database = input("Database name [supply_ontology_hand_poc]: ").strip() or "supply_ontology_hand_poc"
+            database = input("Database name（必填）: ").strip()
+            if not database:
+                raise ValueError("数据库名不能为空；请填写本环境 sample 数据库名")
             user = input("Username: ").strip()
             password = getpass.getpass("Password (hidden): ")
             config = {"database": {"engine": "postgres", "host": host, "port": port, "database": database, "user": user, "password": password, "schema": "public"}, "vega": {"catalog_name": catalog_name, "catalog_host": host, "connector_type": "postgresql", "connector_options": {"sslmode": "disable"}}}

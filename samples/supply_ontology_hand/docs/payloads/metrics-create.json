@@ -150,7 +150,7 @@
     },
     {
       "name": "未关闭预测单数",
-      "comment": "意图：count(id) 且 closestatus_title != 已关闭。定义态 condition 当前会被丢弃；查询时必须再带该过滤。快照 87。",
+      "comment": "意图：count(id) 且 closestatus_title != 已关闭。定义态 condition 当前会被丢弃；查询时必须再带该过滤。快照 90。",
       "tags": ["p0", "planning", "open-caliber"],
       "unit_type": "countUnit",
       "unit": "transaction",

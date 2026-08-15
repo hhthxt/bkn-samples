@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from setup_skill_dataset import expected_tables, load_skill_entries, prompt_database_name, seed_rows
 
 
@@ -27,9 +29,10 @@ def test_seed_rows_are_dataset_records_for_published_skills():
     }]
 
 
-def test_poc_database_name_has_safe_default(monkeypatch):
+def test_database_name_must_be_explicit_for_isolated_deployment(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda _: "")
-    assert prompt_database_name() == "supply_ontology_hand_poc"
+    with pytest.raises(ValueError, match="数据库名不能为空"):
+        prompt_database_name()
 
 
 def test_load_skill_entries_accepts_cli_data_and_keeps_published_only():

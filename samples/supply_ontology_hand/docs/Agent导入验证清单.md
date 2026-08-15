@@ -32,7 +32,7 @@ I. 治理题：监控任务须确认；发起 PO 拒绝自动
 | # | 检查 | 期望 | 证据 | 通过 |
 |---|------|------|------|------|
 | 1.1 | 知识网络名称 / ID | `供应链本体知识网络-手工版` / `supply_ontology_hand` | `openbkn` 列表或 UI | ☐ |
-| 1.2 | 对象类可列出 | 12 个 OT；前缀 `supply_ontology_hand_` | `search_schema` / OT 列表 | ☐ |
+| 1.2 | 对象类可列出 | 15 个 OT；业务对象前缀为 `supply_ontology_hand_`，另有 `skills` | `search_schema` / OT 列表 | ☐ |
 | 1.3 | 产品实例 | **30** | 对象查询 count | ☐ |
 | 1.4 | 物料实例 | **3497** | 同上 | ☐ |
 | 1.5 | 供应商 | **230** | 同上 | ☐ |
@@ -40,7 +40,7 @@ I. 治理题：监控任务须确认；发起 PO 拒绝自动
 | 1.7 | 预测覆盖 | 30 个成品都能联到预测 | 关系 `prod2fcst` | ☐ |
 | 1.8 | BOM→物料 | 无孤儿物料码 | `smoke_test` / join_checks | ☐ |
 | 1.9 | PO→供应商 | 供应商码可命中 | 同上 | ☐ |
-| 1.10 | 监控任务 | 未绑定，实例为空 **属预期** | 不要当成导入失败 | ☐ |
+| 1.10 | 监控任务 | 步骤 8 后绑定 `sc_plan_monitor_task`；初始实例为空属预期 | 不要当成导入失败 | ☐ |
 
 ```bash
 cd tools
@@ -55,7 +55,7 @@ python3 smoke_test.py --config config.yaml
 | erp_material | 3497 |
 | erp_material_bom | 31423 |
 | erp_real_time_inventory | 19724 |
-| erp_mds_forecast | 134 |
+| erp_mds_forecast | 137 |
 | erp_mrp_plan_order | 824 |
 | erp_purchase_request | 19333 |
 | erp_purchase_order | 1972 |
@@ -79,7 +79,7 @@ python3 smoke_test.py --config config.yaml
 | 2.7 | 382-000005 成品仓可用多少？ | 约 **534** | ☐ |
 | 2.8 | 791-000013 生产可用多少？ | **1000** | ☐ |
 | 2.9 | 未关闭预测多少张？382 未关闭数量？ | **90** 张（查询须带关闭状态）；382 约 **2605** | ☐ |
-| 2.10 | 禁止事项 | 未用 `run_sql` 重算已建模指标；未引用 hd0202 的 431；未把未过滤的 134 当成未关闭 | ☐ |
+| 2.10 | 禁止事项 | 未用 `run_sql` 重算已建模指标；未引用 hd0202 的 431；未把未过滤的 137 当成未关闭 | ☐ |
 
 ---
 

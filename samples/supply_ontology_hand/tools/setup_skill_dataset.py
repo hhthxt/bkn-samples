@@ -100,7 +100,10 @@ def interactive_connection():
 
 
 def prompt_database_name() -> str:
-    return input("数据库名 [supply_ontology_hand_poc]: ").strip() or "supply_ontology_hand_poc"
+    database = input("数据库名（必填）: ").strip()
+    if not database:
+        raise ValueError("数据库名不能为空；请填写本环境 sample 数据库名")
+    return database
 
 
 def main() -> None:
