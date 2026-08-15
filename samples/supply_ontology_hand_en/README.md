@@ -10,7 +10,7 @@
 
 ## Documentation
 
-[Supply Chain Ontology Handbook HTML](./docs/handbook.html) · [Agent operation](./docs/agent-operation-guide.md) · [Manual operation](./docs/manual-operation-guide.md) · [Playbook](./docs/playbook.md) · [QA set](./docs/qa-eval-set.yaml)
+[Supply Chain Ontology Handbook HTML](./docs/handbook.html) · [Agent operation](./docs/agent-operation-guide.md) · [Manual operation](./docs/manual-operation-guide.md) · [Third-party FAQ](./docs/faq.md) · [Playbook](./docs/playbook.md) · [QA set](./docs/qa-eval-set.yaml)
 
 Canonical design is **Chinese** (this sample’s KN model and CSVs are Chinese):
 

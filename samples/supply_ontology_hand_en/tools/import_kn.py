@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
-_DEFAULT_JSON = _SCRIPT_DIR.parent / "kn" / "supply_ontology_hand.json"
+_DEFAULT_JSON = _SCRIPT_DIR.parent / "kn" / "supply_ontology_hand_en.json"
 _IMPORT_PATH = "/api/ontology-manager/v1/knowledge-networks"
 _UI_FALLBACK_MSG = "请按说明书步骤 2 UI 导入知识网络"
 
@@ -24,12 +24,32 @@ def run_cmd(args: list[str]) -> str:
     return proc.stdout
 
 
-def import_kn(json_path: Path, *, dry_run: bool = False) -> dict:
+def resolve_default_embedding() -> str:
+    raw = run_cmd([
+        "openbkn", "--json", "model", "small", "get-default", "--type", "embedding"
+    ])
+    model_id = json.loads(raw).get("model_id")
+    if not model_id:
+        raise RuntimeError("target environment has no default embedding model")
+    return str(model_id)
+
+
+def import_kn(
+    json_path: Path, *, dry_run: bool = False, resolve_embedding: bool = False
+) -> dict:
     payload = json.loads(json_path.read_text(encoding="utf-8"))
     kn_id = payload.get("id")
     kn_name = payload.get("name")
     if not kn_id or not kn_name:
         raise ValueError(f"KN JSON missing id/name: {json_path}")
+
+    if resolve_embedding:
+        embedding_id = resolve_default_embedding()
+        for obj in payload.get("object_types", []):
+            for prop in obj.get("data_properties", []):
+                vector = prop.get("index_config", {}).get("vector_config")
+                if vector and vector.get("enabled"):
+                    vector["model_id"] = embedding_id
 
     report = {
         "json_path": str(json_path),
@@ -64,10 +84,19 @@ def main(argv: list[str] | None = None) -> int:
         help="Path to KN export JSON (default: ../kn/supply_ontology_hand.json)",
     )
     parser.add_argument("--dry-run", action="store_true", help="Only print kn id/name")
+    parser.add_argument(
+        "--resolve-embedding",
+        action="store_true",
+        help="Resolve the target environment default embedding before import",
+    )
     args = parser.parse_args(argv)
 
     try:
-        report = import_kn(Path(args.json), dry_run=args.dry_run)
+        report = import_kn(
+            Path(args.json),
+            dry_run=args.dry_run,
+            resolve_embedding=args.resolve_embedding,
+        )
         print(json.dumps(report, ensure_ascii=False, indent=2))
         return 0
     except (RuntimeError, json.JSONDecodeError, OSError, ValueError) as exc:

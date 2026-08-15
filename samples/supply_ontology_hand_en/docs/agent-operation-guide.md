@@ -14,9 +14,9 @@ Recommended entry sequence:
 
 ```bash
 openbkn auth status
-openbkn bkn validate kn/supply_ontology_hand_en.json
+python3 tools/import_kn.py --json kn/supply_ontology_hand_en.json --dry-run
 python3 tools/load_sample_data.py --config tools/config.yaml
-python3 tools/import_kn.py --kn-file kn/supply_ontology_hand_en.json
+python3 tools/import_kn.py --json kn/supply_ontology_hand_en.json --resolve-embedding
 python3 tools/bind_kn_resources.py --config tools/config.yaml --kn-id supply_ontology_hand_en
 python3 tools/register_skills.py --dry-run
 python3 tools/setup_action_datasets.py --engine postgres

@@ -16,7 +16,7 @@ Manual mode combines console UI operations with scripts. It does not use Agent d
 ```bash
 cd tools
 python3 load_sample_data.py --config config.yaml
-python3 import_kn.py --kn-file ../kn/supply_ontology_hand_en.json
+python3 import_kn.py --json ../kn/supply_ontology_hand_en.json
 python3 bind_kn_resources.py --config config.yaml --kn-id supply_ontology_hand_en
 python3 verify_sample.py --config config.yaml --kn-id supply_ontology_hand_en
 ```
