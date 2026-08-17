@@ -59,7 +59,7 @@ python3 power_layer.py all --kn-id supply_ontology_hand
 
 | 脚本 | 步骤 | 说明 |
 |------|------|------|
-| `import_kn.py` | 2 | 导入 `kn/supply_ontology_hand.json` |
+| `import_kn.py` | 2 | 使用目标环境 embedding 模型导入 `kn/supply_ontology_hand.json`（执行时带 `--resolve-embedding`） |
 | `load_sample_data.py` | 3 | 将 `data/*.csv` 灌入自备数据库 |
 | `setup_catalog.py` | 4 | 创建 / 启用 Catalog 并扫描表 |
 | `bind_kn_resources.py` | 5 | 对象类绑定 Catalog 资源 |

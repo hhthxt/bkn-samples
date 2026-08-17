@@ -85,6 +85,7 @@
 
 - [ ] 能登录 OpenBKN Web 控制台
 - [ ] 大小模型可正常对话（Agent / 模型工厂可用）
+- [ ] 目标环境已配置默认 embedding 模型（脚本导入会自动读取）
 
 > 步骤 2 导入知识网络可在 Web UI 完成；步骤 4～5 依赖 CLI，见下文。
 
@@ -192,6 +193,8 @@ openbkn auth whoami
 
 **操作面：** OpenBKN Web UI（知识网络管理）
 
+> 当前 Sample JSON 可能包含制作环境遗留的 embedding 模型 ID，直接上传原始 JSON 可能报「小模型获取失败」。生态伙伴优先使用下方脚本方式；若必须手工导入，应先使用目标环境可用的 embedding 模型处理便携 JSON。
+
 1. 进入「知识网络」→「导入 / 上传 JSON」
 2. 选择上述 JSON 文件并提交
 3. 导入完成后在列表中验收
@@ -203,19 +206,16 @@ openbkn auth whoami
 ```bash
 cd tools
 openbkn auth status
-python3 import_kn.py
+openbkn --json model small get-default --type embedding
+python3 import_kn.py --resolve-embedding
 openbkn --json bkn get supply_ontology_hand
 ```
 
-`import_kn.py` 默认读取 `../kn/supply_ontology_hand.json`，通过 `openbkn call` 调用平台导入 API，并校验 `bkn get` 可读到目标 ID。
+`import_kn.py` 默认读取 `../kn/supply_ontology_hand.json`。`--resolve-embedding` 会先读取目标环境的默认 embedding 模型，并替换 JSON 中原环境遗留的模型 ID，再通过 `openbkn call` 调用平台导入 API，最后校验 `bkn get` 可读到目标 ID。
 
-**等价 CLI 一行（不经过 Python 包装）：**
+这是推荐方式。不要省略 `--resolve-embedding`：Sample JSON 不能假设生态伙伴的平台与制作 Sample 的平台使用同一个 embedding 模型 ID。
 
-```bash
-openbkn --json call -X POST /api/ontology-manager/v1/knowledge-networks \
-  -d "$(cat ../kn/supply_ontology_hand.json)"
-openbkn --json bkn get supply_ontology_hand
-```
+**关于直接调用 API：** 不建议直接把原始 JSON 通过 `openbkn call` POST 导入，因为其中可能包含原环境的 embedding 模型 ID。若必须直接调用 API，应先在目标平台选择可用的 embedding 模型，或使用已清除环境模型引用的便携 JSON。
 
 > 若平台返回「名称已存在」，说明同名校验冲突：删除或重命名平台上已有 KN 后重试，或改用 UI 覆盖导入（视平台版本而定）。
 
@@ -233,7 +233,7 @@ KN 文件：<体验包根目录>/kn/supply_ontology_hand.json
 
 请依次：
 1. 运行 openbkn auth status，确认已认证
-2. 在 <体验包根目录>/tools 执行 python3 import_kn.py（或等价 openbkn call POST /api/ontology-manager/v1/knowledge-networks）
+2. 在 <体验包根目录>/tools 先运行 `openbkn --json model small get-default --type embedding`，再执行 `python3 import_kn.py --resolve-embedding`
 3. 运行 openbkn --json bkn get supply_ontology_hand 验收
 4. 回报 kn_id、名称是否与上一致；失败则给出 stderr 与 UI 降级建议
 
@@ -605,7 +605,9 @@ python3 smoke_test.py --config config.yaml
 | 步骤 4/5 报 401 / 未认证 | 活跃平台不对 | `openbkn auth list` → `openbkn auth use <url>` |
 | 导入 KN 报「ID 参数无效」 | 网络 ID 超过 32 字符 | 使用本包预设 ID `supply_ontology_hand`，勿随意加长 |
 | 导入 KN 报名称已存在 | 平台已有同名 KN | 删除冲突 KN 或改用 UI；勿改 JSON 内 `id` |
-| `import_kn.py` / call 导入失败 | 未 auth 或 API 路径随版本变化 | 先 `openbkn auth status`；失败则走步骤 2 UI |
+| 导入时报「小模型获取失败」或 `get model request failed` | JSON 携带了其他环境的 embedding 模型 ID；或目标环境没有默认 embedding 模型 | 确认 `openbkn --json model small get-default --type embedding` 有返回；使用 `python3 import_kn.py --resolve-embedding` 重试；不要直接 POST 原始 JSON |
+| `import_kn.py` 提示 `unrecognized arguments: --resolve-embedding` | 使用了旧版 Sample | 从 bkn-samples 主线重新下载 Sample，或升级 `tools/import_kn.py` 后再执行 |
+| `import_kn.py` / call 导入失败 | 未 auth 或 API 路径随版本变化 | 先 `openbkn auth status`；确认使用 `--resolve-embedding`；仍失败再走步骤 2 UI |
 | 灌库连接失败 | 库不存在 / 地址 / 账号 / 防火墙 | 确认已 `CREATE DATABASE`；检查 `config.yaml`；用客户端直连验证 |
 | 灌库报 Unknown database | 目标库未创建 | 先建空库，库名与 `database` 字段一致 |
 | 误指向共用库 | `recreate` 覆盖同名 12 表 | 改用专用库名；勿对生产库执行灌库 |
