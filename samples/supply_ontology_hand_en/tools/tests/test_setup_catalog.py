@@ -36,6 +36,23 @@ def test_build_connector_config_uses_catalog_host_override():
     assert conn["database"] == "supply_demo_hand"
     assert conn["schemas"] == ["public"]
     assert conn["password"] == ""
+    assert "options" not in conn
+
+
+def test_build_connector_config_forwards_explicit_options_only():
+    cfg = {
+        "database": {
+            "host": "127.0.0.1",
+            "port": 5432,
+            "database": "supply_demo_hand",
+            "user": "leecky",
+        },
+        "vega": {"connector_options": {"sslmode": "disable"}},
+    }
+
+    conn = build_connector_config(cfg)
+
+    assert conn["options"] == {"sslmode": "disable"}
 
 
 def test_build_connector_config_mysql_engine_name():

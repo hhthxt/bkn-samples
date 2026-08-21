@@ -56,8 +56,10 @@ def build_connector_config(cfg: dict) -> dict:
         "username": db["user"],
         "database": db["database"],
         "schemas": [schema] if isinstance(schema, str) else list(schema),
-        "options": dict(vega.get("connector_options") or {"sslmode": "disable"}),
     }
+    connector_options = vega.get("connector_options")
+    if connector_options:
+        connector["options"] = dict(connector_options)
     password = db.get("password")
     if password is None:
         password = ""
@@ -287,7 +289,7 @@ def main(argv: list[str] | None = None) -> int:
                 raise ValueError("数据库名不能为空；请填写本环境 sample 数据库名")
             user = input("Username: ").strip()
             password = getpass.getpass("Password (hidden): ")
-            config = {"database": {"engine": "postgres", "host": host, "port": port, "database": database, "user": user, "password": password, "schema": "public"}, "vega": {"catalog_name": catalog_name, "catalog_host": host, "connector_type": "postgresql", "connector_options": {"sslmode": "disable"}}}
+            config = {"database": {"engine": "postgres", "host": host, "port": port, "database": database, "user": user, "password": password, "schema": "public"}, "vega": {"catalog_name": catalog_name, "catalog_host": host, "connector_type": "postgresql"}}
         else:
             config = load_config(config_path)
         mapping = load_mapping()
