@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import date
 from typing import Any
 
 from context.assembler import ResolvedContextAssembler
@@ -16,12 +17,12 @@ class FulfillmentCommitmentRunner:
         self.provider = OfflineSnapshotProvider(data_dir)
         self.assembler = ResolvedContextAssembler()
 
-    def run(self, *, product: str, forecast_id: str, demand_end: str, demand_qty: float, substitute_enabled: bool, demands: list[dict[str, Any]] | None = None, report_grain: str = "summary") -> dict[str, Any]:
+    def run(self, *, product: str, forecast_id: str, demand_end: str, demand_qty: float, substitute_enabled: bool, demands: list[dict[str, Any]] | None = None, report_grain: str = "summary", as_of_date: str = "2026-08-15") -> dict[str, Any]:
         if not forecast_id:
             raise ValueError("forecast_id is required")
         context = self.provider.capture(datasets=DATASETS, product=None if demands else product, forecast_id=forecast_id)
         envelope = self.assembler.assemble(context, required_datasets("backward_plan"), source=SOURCE_OFFLINE_TEST)
-        s1 = backward_plan(envelope.snapshot, product, forecast_id=forecast_id, demand_end=demand_end, demand_qty=demand_qty, substitute_enabled=substitute_enabled, report_grain=report_grain)
+        s1 = backward_plan(envelope.snapshot, product, forecast_id=forecast_id, demand_end=demand_end, demand_qty=demand_qty, substitute_enabled=substitute_enabled, report_grain=report_grain, today=date.fromisoformat(as_of_date))
         s2 = total_sellable(envelope.snapshot, product, substitute_enabled=substitute_enabled)
         steps = [{"id": "s1", "name": "生产计划倒排与齐套诊断", "result": s1}, {"id": "s2", "name": "产品可售能力", "result": s2}]
         if demands:
