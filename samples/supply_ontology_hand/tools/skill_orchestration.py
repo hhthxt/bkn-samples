@@ -47,10 +47,19 @@ def build_toolbox_request(
             raise ValueError(f"bkn_context.{field} is required")
 
     context = _require_mapping(resolved_context, "resolved_context")
+    if context.get("source") != "openbkn_context_loader":
+        raise ValueError(
+            "resolved_context.source must be openbkn_context_loader for online Toolbox calls"
+        )
     rows = _require_mapping(context.get("rows"), "resolved_context.rows")
     receipts = _require_mapping(context.get("receipts"), "resolved_context.receipts")
     missing_rows = sorted(name for name in required if not rows.get(name))
-    missing_receipts = sorted(name for name in required if not receipts.get(name))
+    missing_receipts = sorted(
+        name
+        for name in required
+        if not isinstance(receipts.get(name), Mapping)
+        or not str(receipts[name].get("receipt_id") or "").strip()
+    )
     if missing_rows:
         raise ValueError(f"resolved_context.rows missing: {', '.join(missing_rows)}")
     if missing_receipts:

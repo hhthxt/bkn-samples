@@ -62,6 +62,20 @@ def test_requires_receipts_for_every_required_dataset():
         build_toolbox_request("backward_plan", **request)
 
 
+def test_requires_online_context_loader_source():
+    request = valid_request()
+    request["resolved_context"]["source"] = "offline_test"
+    with pytest.raises(ValueError, match="openbkn_context_loader"):
+        build_toolbox_request("backward_plan", **request)
+
+
+def test_requires_receipt_id_for_every_required_dataset():
+    request = valid_request()
+    request["resolved_context"]["receipts"]["forecast"] = {"dataset": "forecast"}
+    with pytest.raises(ValueError, match="forecast"):
+        build_toolbox_request("backward_plan", **request)
+
+
 def test_rejects_incomplete_business_parameters_before_function_call():
     request = valid_request()
     request["parameters"].pop("demand_end")

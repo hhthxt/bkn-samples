@@ -21,6 +21,31 @@
 
 ## 1. 评测对象与固定输入
 
+### 1.1 线上 A 路径发布门禁
+
+A 路径只有在以下链路全部有真实证据时才允许记为 `passed`：
+
+```text
+真实 MCP Interaction
+  → Context Loader 精确条件查询
+  → 每个结果对应合法 bkn_receipt
+  → 按工具箱名称解析当前 published deployment
+  → 13 个 enabled 工具中的只读函数成功调用
+  → Trace 以同一 conversation_id / interaction_id 回读
+```
+
+运行前先解析当前环境的工具箱实例：
+
+```bash
+cd samples/supply_ontology_hand/tools
+python3 resolve_function_toolbox.py \
+  --box-name "供应链计算函数工具箱" \
+  --required-tool-count 13 \
+  --write-state
+```
+
+`tools/.deployment/function-toolbox.json` 只保存本环境实际 `box_id`，不会进入 Git。旧 UUID、离线 `fn_cli.py`、未过滤的 Context Loader 返回、缺少 `receipt_id` 或无法回读 Trace，都会使 A 路径保持 `blocked`，不得降级为“线上通过”。验收证据可用 `tools/online_acceptance.py` 的 `validate_path_a_evidence` 校验。
+
 - **题目**：`datasets/sample-question-set-v1.yaml` 中的 30 道业务问题。
 - **答案集**：`datasets/sample-answer-set-v1.yaml`；仅 C 可读取，A、B 不可读取。
 - **数据快照**：2026-08-13 的供应链 sample 数据。

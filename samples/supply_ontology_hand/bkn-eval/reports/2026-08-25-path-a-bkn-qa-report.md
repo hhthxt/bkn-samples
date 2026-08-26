@@ -1,13 +1,15 @@
-# 供应链 Sample 问题集作答报告（路径 A：BKN）
+# 供应链 Sample 问题集作答报告（路径 A：BKN，BLOCKED）
+
+> 发布门禁：**BLOCKED**。本报告不能作为线上 A 路径通过报告。报告中的函数题结果是离线口径对照，不是已发布 Toolbox 的线上执行结果；在完成真实 MCP Interaction → 精确对象查询与 `bkn_receipt` → 当前已发布 Toolbox 只读函数 → Trace 回读之前，不得将本报告标记为通过。
 
 - **题集**：`datasets/sample-question-set-v1.yaml`（supply-sample-question-set-v1，共 **30** 题：M8 + F15 + S5 + G2）
 - **路径**：A（供应链本体知识网络-手工版 `supply_ontology_hand`；未读答案集）
 - **知识网络**：`supply_ontology_hand`（供应链本体知识网络-手工版）
 - **评估基线日**：`2026-08-25`（日期敏感题按此日）
 - **作答时间**：2026-08-25
-- **运行模式**：批量一轮（30 题同会话连续作答，非整题独立 Trial）
+- **运行模式**：历史批量一轮；本次线上 A 验收状态为 `blocked`
 - **会话转写**：`57f76300-dbd7-4693-8713-f6e0bd9fc1a3`
-- **说明**：如实记录；复杂齐套/可售/倒排等与线上指标/SQL 交叉核对。平台 Toolbox（`71600d21-…`）本次不可用，函数类题用与本网配套计算口径（同包 `tools/fn_cli.py`）在与线上一致的数据快照上计算。
+- **说明**：如实记录；复杂齐套/可售/倒排等与线上指标/SQL 交叉核对。平台 Toolbox 当时不可用，函数类题使用了同包离线口径，因此只能作为诊断材料，不能证明线上 A 路径可用。旧 Toolbox UUID 不属于可移植样例契约，当前环境必须按工具箱名称重新解析。
 
 ## 效率观测（运行时长 / Token）
 
@@ -25,11 +27,11 @@
 
 | question_id | 运行状态 | 运行时长 | 实际 token | 证据索引 |
 |---|---|---|---|---|
-| M-01 ~ M-08（8 题） | completed | 见批量总计（摊销约 16.2s/题） | unavailable | 线上 `query_metric` / `run_sql`；Trace interaction 如上 |
-| F-01 ~ F-15（15 题） | completed | 同上 | unavailable | 线上 SQL + 配套函数口径；Toolbox 不可用已注明 |
-| S-01 ~ S-05（5 题） | completed | 同上 | unavailable | 齐套/可售/倒排/争用函数 + 治理口径 |
-| G-01 ~ G-02（2 题） | completed（拒绝执行/拒绝承诺） | 同上 | unavailable | 治理边界，无写入行动 |
-| **合计** | **30 题** | **≈ 486,000 ms** | **unavailable** | M8+F15+S5+G2 |
+| M-01 ~ M-08（8 题） | historical comparison only | 见批量总计（摊销约 16.2s/题） | unavailable | 未形成线上 A 验收证据 |
+| F-01 ~ F-15（15 题） | blocked | 同上 | unavailable | 未通过已发布 Toolbox 只读调用 |
+| S-01 ~ S-05（5 题） | blocked | 同上 | unavailable | 未通过已发布 Toolbox 只读调用 |
+| G-01 ~ G-02（2 题） | historical comparison only | 同上 | unavailable | 治理边界，无写入行动 |
+| **合计** | **A 路径 blocked** | **≈ 486,000 ms（历史批次）** | **unavailable** | 不得视为线上通过 |
 
 若后续从 Cursor Usage / 平台 Trace 补到本会话官方 token，应回填上表「实际 token」列，并保留本次 `unavailable` 原始记录不改写答案正文。
 
@@ -330,4 +332,4 @@
 | 运行时长 | 墙钟：17:59:00 → 18:07:06（+08），约 486,000 ms |
 | Token | 官方计量未取得（`unavailable`），未使用估算值冒充实测 |
 
-平台侧「供应链计算函数工具箱」本次 `toolbox not found`，故函数题未走线上 Tool execute，而用同包离线函数 + 线上核对。若需纯线上 Tool 复跑，需先恢复该 Toolbox 发布状态。
+平台侧「供应链计算函数工具箱」本次 `toolbox not found`，故函数题未走线上 Tool execute，而用同包离线函数 + 线上核对。该结果明确为 `blocked`。复跑必须执行 `tools/resolve_function_toolbox.py`，再完成真实 MCP Interaction、精确查询及回执校验、已发布 Toolbox 只读函数调用和 Trace 回读；验收失败时不得调用 `fn_cli.py` 代替线上结果。
