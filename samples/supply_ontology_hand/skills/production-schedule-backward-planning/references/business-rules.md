@@ -1,6 +1,6 @@
 # 业务规则：生产计划倒排 · 齐套诊断
 
-口径 SSOT：体验包 `docs/能力口径清单.md`。倒排计算由 Toolbox `backward_plan`（生产计划齐套倒排）执行；本文件只写 S1 编排要用的倒排 / 10 档 / A/B，禁止在 Skill 内另写公式。
+本文件是 S1 包内的倒排、供应状态和 A/B 延迟口径。已发布的生产计划齐套倒排函数按本口径自行读取知识网络并计算；Agent 不在本地复算。
 
 输入粒度：一个产品 + 一张需求预测。
 
@@ -34,7 +34,7 @@ if supply >= grossRequirement → sufficient
 if 外购 or 委外:
   if !hasMRP → anomaly
   if has_po and poDeliverDate:
-    if poDeliverDate <= today → po_overdue
+    if poDeliverDate <= business_date → po_overdue
     if poDeliverDate > endDate → deadline_risk
   if not has_po:
     if standardLeadtime > days_until(endDate) → deadline_risk
@@ -59,7 +59,7 @@ if 自制:
 
 仅 `bom_level > 0`；同料号保留最大延迟。
 
-**A 类**：外购/委外；`start < today`；无 PO；库存不满足；`delayDays = max(0, (today + LT) − end)`。
+**A 类**：外购/委外；`start < business_date`；无 PO；库存不满足；`delayDays = max(0, (business_date + LT) − end)`。
 
 **B 类**：有 PO 且 `poDeliverDate > end`。
 

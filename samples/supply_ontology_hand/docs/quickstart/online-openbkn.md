@@ -1,25 +1,29 @@
 # OpenBKN 在线体验
 
-在线路径与离线路径共享函数和业务口径。区别只有数据交接方式：第三方 Agent 自己调用官方 Context Loader，函数服务不查远端。
+在线体验让第三方 Agent 在 OpenBKN 中完成查询和计算；Agent 不需要数据库账号、函数服务器地址、Token、快照文件或 Toolbox UUID。
 
-## 强制流程
+## 标准流程
 
 ```text
-bkn_start_interaction
-  → 官方 Context Loader 查询 BOM/库存/物料/PO/PR/MRP/预测
-  → 保留每次查询的 bkn_receipt
-  → 组装 resolved_context
-  → 调用函数 Tool 或 Skill
-  → 形成报告和 Action 提案
+导入样例并完成 Catalog 扫描、资源绑定
+  → bkn_start_interaction
+  → Context Loader 查询供应链事实
+  → tools/list 了解可用的供应链函数
+  → 按业务名称调用函数，只传业务参数
+  → 函数以调用者权限通过 sandbox_sdk.bkn 读取所需 BKN 数据并计算
+  → 输出业务结论和依据
   → bkn_finish_interaction
 ```
 
-`resolved_context` 至少包含 `knowledge_network_id`、`conversation_id`、`interaction_id`、带时区的 `captured_at`、`bkn_receipts` 和逻辑数据集行。
+函数的输入只包括产品、预测单、数量、截止日、替代料策略等业务参数。例如，核查已有预测单或一条新客户需求能否按期交付时，调用“生产计划齐套倒排”并提供产品、需求数量、截止日及可选的替代料策略；已有预测单时再补充预测单号即可。
 
-不要自行实现 HTTP、JSON-RPC、MCP 或 Context Loader 包装层；不要伪造 receipt；不要让函数服务直连绑定数据库；实时路径不能回退 CSV。
+函数在运行时使用 `sandbox_sdk.bkn` 读取已绑定的供应链知识网络。平台负责把已认证调用者和本次 Interaction 传入沙箱；Agent 不应拼装内部上下文、传递认证信息或配置函数服务地址。
 
-## 与离线结果对照
+## 使用边界
 
-同一个场景应使用相同的产品、预测单、截止日和数量。比较 `snapshot_meta.input_digest`、S1/S2/S3 的业务结论和证据；允许的差异只能来自实时数据变化，并且必须在报告中说明。
+- 先完成导入、Catalog 扫描和对象类资源绑定；这是在线体验的环境准备，不是每道题的手工步骤。
+- 复杂业务计算优先调用已发布的供应链函数，避免不同 Agent 自行实现不同计算口径。
+- 函数未覆盖的问题可以基于 Context Loader 已返回的数据补充分析，并在报告中说明口径。
+- 不要将离线 CSV 或本地数据库作为在线体验的计算数据源。
 
-详细数据集需求见 [第三方 Agent 数据交接说明](../第三方Agent数据交接说明.md)。
+各函数的业务用途和参数见[函数目录](../catalog/functions.md)；面向 Agent 的受管调用说明见[第三方 Agent 数据交接说明](../第三方Agent数据交接说明.md)。

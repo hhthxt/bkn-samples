@@ -1,6 +1,6 @@
 # S1 调用的 Metric / 函数
 
-体验网：`supply_ontology_hand`。口径 SSOT：`docs/能力口径清单.md`。
+知识网络：`supply_ontology_hand`。本文件只说明 S1 使用的指标及其业务边界。
 
 本 Skill **不得**用 Metric 替代 BOM 倒排。仓口径用 `warehouse_scope`，不要把仓名单写死在公式里。
 

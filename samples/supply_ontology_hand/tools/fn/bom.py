@@ -9,13 +9,13 @@ from .snapshot import Snapshot, _f, _i
 def is_main_row(row: dict) -> bool:
     priority = _i(row.get("alt_priority"), 0)
     method = (row.get("alt_method") or "").strip()
-    return priority == 0 and method not in ("替代", "Substitute")
+    return priority == 0 and method != "替代"
 
 
 def is_substitute_row(row: dict) -> bool:
     method = (row.get("alt_method") or "").strip()
     priority = _i(row.get("alt_priority"), 0)
-    return method in ("替代", "Substitute") or priority > 0
+    return method == "替代" or priority > 0
 
 
 def product_bom_rows(snap: Snapshot, product: str) -> list[dict]:
@@ -65,10 +65,19 @@ def bom_list(
     *,
     depth: int | None = 1,
     include_substitute: bool = False,
+    report_grain: str = "summary",
+    page_size: int = 100,
+    offset: int = 0,
 ) -> dict:
     product = (product or "").strip()
     if not product:
         raise CannotCompute("缺少产品编码")
+    if report_grain not in {"summary", "full"}:
+        raise CannotCompute("report_grain 只能为 summary 或 full")
+    if isinstance(page_size, bool) or not isinstance(page_size, int) or not 1 <= page_size <= 500:
+        raise CannotCompute("page_size 必须是 1 到 500 的整数")
+    if isinstance(offset, bool) or not isinstance(offset, int) or offset < 0:
+        raise CannotCompute("offset 必须是非负整数")
     rows = product_bom_rows(snap, product)
     if not rows:
         raise CannotCompute(f"无 BOM：{product}")
@@ -81,11 +90,10 @@ def bom_list(
         r for r in mains if _i(r.get("bom_level"), 0) == 1
     ]
     levels = [_i(r.get("bom_level"), 0) for r in rows]
-    return {
+    result = {
         "product_code": product,
         "include_substitute": include_substitute,
         "depth": depth,
-        "lines": [_line_payload(r) for r in scoped],
         "line_count": len(mains) if not include_substitute else len(
             filter_bom_rows(rows, include_substitute=True, depth=None)
         ),
@@ -99,7 +107,87 @@ def bom_list(
         "l1_main_count": len(l1_main),
         "rows_incl_root": len(rows),
         "caliber": "main_only" if not include_substitute else "include_substitute",
+        "report_grain": report_grain,
+        "l1_lines": [_line_payload(r) for r in l1_main],
     }
+    if report_grain == "full":
+        page = scoped[offset : offset + page_size]
+        next_offset = offset + len(page)
+        result.update(
+            {
+                "lines": [_line_payload(r) for r in page],
+                "offset": offset,
+                "page_size": page_size,
+                "next_offset": next_offset if next_offset < len(scoped) else None,
+                "scoped_line_count": len(scoped),
+            }
+        )
+    return result
+
+
+def material_where_used(
+    snap: Snapshot,
+    material_code: str,
+    *,
+    report_grain: str = "summary",
+    include_substitute: bool = True,
+) -> dict:
+    """Return finished products affected by one material through their BOMs."""
+    material_code = (material_code or "").strip()
+    if not material_code:
+        raise CannotCompute("缺少物料编码")
+    if report_grain not in {"summary", "full"}:
+        raise CannotCompute("report_grain 只能为 summary 或 full")
+
+    # Impact analysis includes alternate branches by default: a material that
+    # appears as a qualified substitute still affects a product's supply risk.
+    rows = list(snap.bom) if include_substitute else [
+        row for row in snap.bom if is_main_row(row)
+    ]
+    parents_by_child: dict[str, list[dict]] = defaultdict(list)
+    for row in rows:
+        child = (row.get("material_code") or "").strip()
+        if child:
+            parents_by_child[child].append(row)
+
+    # A component can first be assembled into an intermediate material and then
+    # flow into further products.  Traverse parent links to report every final
+    # product affected by the original material, not merely its direct parents.
+    hits: dict[str, list[dict]] = defaultdict(list)
+    visited = {material_code}
+    pending = [material_code]
+    while pending:
+        child = pending.pop()
+        for row in parents_by_child.get(child, []):
+            product_code = (row.get("bom_material_code") or "").strip()
+            if product_code:
+                hits[product_code].append(_line_payload(row))
+            parent = (row.get("parent_material_code") or "").strip()
+            if parent and parent not in visited:
+                visited.add(parent)
+                pending.append(parent)
+    if not hits:
+        raise CannotCompute(f"物料未被任何产品 BOM 使用：{material_code}")
+
+    product_codes = sorted(hits)
+    result = {
+        "material_code": material_code,
+        "affected_product_count": len(product_codes),
+        "product_codes": product_codes,
+        "include_substitute": include_substitute,
+        "caliber": (
+            "bom_root_products_including_substitute"
+            if include_substitute
+            else "main_bom_root_products"
+        ),
+        "report_grain": report_grain,
+    }
+    if report_grain == "full":
+        result["paths"] = [
+            {"product_code": product, "bom_lines": hits[product]}
+            for product in product_codes
+        ]
+    return result
 
 
 def unique_child_codes(

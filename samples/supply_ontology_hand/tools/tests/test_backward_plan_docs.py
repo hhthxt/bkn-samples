@@ -1,45 +1,41 @@
-"""S1 and partner-handoff contracts for backward_plan."""
+"""S1 delivery scenario routing and partner-handoff coverage."""
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 PACK = Path(__file__).resolve().parents[2]
 HANDOFF = PACK / "docs" / "第三方Agent数据交接说明.md"
-CONTRACT = PACK / "docs" / "payloads" / "resolved-context-contracts.json"
 S1 = PACK / "skills" / "production-schedule-backward-planning" / "SKILL.md"
 IO = PACK / "skills" / "production-schedule-backward-planning" / "references" / "io-contract.md"
 RULES = PACK / "skills" / "production-schedule-backward-planning" / "references" / "business-rules.md"
 REPORT = PACK / "skills" / "production-schedule-backward-planning" / "references" / "report-spec.md"
+METRICS = PACK / "skills" / "production-schedule-backward-planning" / "references" / "kn-metrics.md"
 
-S1_SNIPPETS = [
-    "官方 Context Loader",
-    "bkn_start_interaction",
-    "bkn_receipt",
-    "只查询一次",
-    "resolved_context",
-    "函数服务不查询",
-    "bkn_finish_interaction",
+S1_NAVIGATION_SNIPPETS = [
+    "业务场景",
+    "优先指标",
+    "优先函数",
     "生产计划齐套倒排",
-    "backward_plan",
-    "一张需求预测",
-    "禁止伪造",
-    "禁止 CSV",
+    "新增客户需求",
+    "business_date",
+    "2026-08-25",
     "人工确认",
     "采购申请决策",
     "不创建 ERP",
 ]
 
 
-def test_s1_skill_prefers_backward_plan_and_handoff_protocol():
+def test_s1_skill_routes_delivery_scenarios_without_runtime_rebuild():
     text = S1.read_text(encoding="utf-8")
-    for snippet in S1_SNIPPETS:
+    for snippet in S1_NAVIGATION_SNIPPETS:
         assert snippet in text, f"S1 SKILL 缺少：{snippet}"
-    assert "不在 Skill 内重写公式" in text or "不在 Skill 中重写" in text
-    assert "initiate_po" in text
-    assert "无截止日" in text or "无日期" in text
-    assert "替代" in text
+    for obsolete in ("run_code", "read_skill_file", "runtime/supply_fn", "build_snapshot"):
+        assert obsolete not in text
+    assert "resolved_context" not in text
+    assert "resolved_context_compressed" not in text
+    assert "supply_chain_compute" not in text
+    assert "函数服务不查询" not in text
 
 
 def test_s1_references_keep_single_forecast_monitor_and_no_erp_write():
@@ -52,12 +48,27 @@ def test_s1_references_keep_single_forecast_monitor_and_no_erp_write():
     assert "initiate_po" in combined or "ERP PR" in combined or "不创建 ERP" in combined
 
 
-def test_handoff_lists_backward_plan_datasets():
+def test_s1_is_self_contained_and_maps_user_input_to_function_contract():
+    skill = S1.read_text(encoding="utf-8")
+    io_contract = IO.read_text(encoding="utf-8")
+    combined = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in (S1, IO, RULES, REPORT, METRICS)
+    )
+
+    assert "product_query" in combined
+    assert "生产计划齐套倒排" in io_contract
+    assert "business_date" in skill
+    assert "2026-08-25" in io_contract
+    assert "resolved_context" not in combined
+    assert "supply_chain_compute" not in combined
+    assert "71600d21-c9f6-4336-bfbf-95bfb3654674" not in skill
+    assert "docs/" not in combined
+
+
+def test_handoff_exposes_backward_plan_as_a_business_function():
     text = HANDOFF.read_text(encoding="utf-8")
-    payload = json.loads(CONTRACT.read_text(encoding="utf-8"))
-    required = payload["operations"]["backward_plan"]["required_rows"]
-    assert "backward_plan" in text
-    for dataset in required:
-        assert dataset in text
-    assert "不要封装 Context Loader" in text
     assert "生产计划齐套倒排" in text
+    assert "函数自行读取" in text
+    assert "不要自行封装 Context Loader" in text
+    assert "数据快照或 `resolved_context` 作为函数参数传递" in text

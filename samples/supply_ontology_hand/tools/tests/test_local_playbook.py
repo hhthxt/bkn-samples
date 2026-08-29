@@ -35,6 +35,7 @@ def test_story_runner_connects_s1_s2_and_s3():
         forecast_id="0000023181",
         demand_end="2026-05-31",
         demand_qty=3000,
+        business_date="2026-08-25",
         substitute_enabled=False,
         demands=[
             {"product_code": "U00-000080", "qty": 3000},
@@ -42,7 +43,8 @@ def test_story_runner_connects_s1_s2_and_s3():
         ],
     )
     assert [step["id"] for step in report["steps"]] == ["s1", "s2", "s3"]
-    assert report["steps"][0]["result"]["max_delay_days"] == 166
+    assert report["steps"][0]["result"]["business_date"] == "2026-08-25"
+    assert report["steps"][0]["result"]["max_delay_days"] == 176
     assert report["steps"][1]["result"]["total_sellable_qty"] == 20
     assert report["snapshot_meta"]["source"] == "offline_test"
 

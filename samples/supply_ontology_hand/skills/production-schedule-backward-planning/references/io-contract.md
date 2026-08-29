@@ -1,7 +1,5 @@
 # 输入输出契约：生产计划倒排（S1）
 
-优先调用 Toolbox Tool `backward_plan`（生产计划齐套倒排）。Skill 不重写倒排公式。
-
 ## user_input
 
 ```json
@@ -11,53 +9,52 @@
   "forecast_id": "FC-001",
   "demand_end": "2026-05-14",
   "demand_qty": 50,
+  "business_date": "2026-08-25",
   "warehouse_scope": "production_available",
   "substitute_enabled": false,
   "report_grain": "summary"
 }
 ```
 
-- `product_query`、`forecast_id`、`demand_end`、`demand_qty`、`substitute_enabled` 必填
-- 一个产品只对应一张需求预测
-- `knowledge_network_id` 可缺省 → `supply_ontology_hand`
-- 无日期或替代策略未确认：不得下齐套/交期结论
+- `product_query`、`demand_end`、`demand_qty`、`substitute_enabled` 必填；`forecast_id` 可选；`business_date` 缺省时为 `2026-08-25`。
+- 一个产品对应一张需求预测；名称命中多个产品编码时先追问。
+- 无日期或替代策略未确认时，不下齐套或交期结论。
 
-## resolved_context
+## 函数调用合同
 
-由 Agent 调用官方 Context Loader 后内联，禁止 CSV 作为运行时输入。
+使用已发布的 **生产计划齐套倒排** 函数。函数调用只传业务参数，函数在运行时自行读取知识网络中的预测、BOM、库存、采购和 MRP 事实。
+
+已有预测单时，函数校验产品、数量和截止日与预测一致；新增客户需求可不传 `forecast_id`，直接以产品、数量、截止日倒排。Agent 不读取 Skill 源码、不传快照、Token 或内部会话字段，也不在本地重写倒排算法。
+
+函数不可用时，可分别调用 **要 X 套净需求与齐套** 和 **标准交期** 解释已知风险；此时应明确“无法形成完整倒排结论”。
+
+## analysis_result
 
 ```json
 {
-  "knowledge_network_id": "supply_ontology_hand",
-  "conversation_id": "conv-example",
-  "interaction_id": "int-example",
-  "captured_at": "2026-08-14T13:00:00+00:00",
-  "bkn_receipts": [],
-  "rows": {
-    "forecast": [],
-    "bom": [],
-    "material": [],
-    "inventory": [],
-    "purchase_order": [],
-    "purchase_request": [],
-    "mrp": []
-  }
+  "product_code": "382-000005",
+  "forecast_id": "FC-001",
+  "demand_end": "2026-05-14",
+  "demand_qty": 50,
+  "business_date": "2026-08-25",
+  "warehouse_filter": "production_available",
+  "finished_goods_qty": 534,
+  "fulfillment_mode": "finished_goods",
+  "production_plan_required": false,
+  "customer_earliest_available_date": "2026-08-25",
+  "customer_late_days": 0,
+  "can_deliver_on_time": false,
+  "max_delay_days": 12,
+  "delay_a": [],
+  "delay_b": [],
+  "supply_status_summary": {},
+  "gaps": []
 }
 ```
 
-分析与报告阶段禁止再拉数。`backward_plan` 的数据集合同见 `docs/payloads/resolved-context-contracts.json`。
+- `business_date`、`warehouse_filter`、`finished_goods_qty`、`fulfillment_mode` 必须回显。
+- `fulfillment_mode=finished_goods` 表示成品现货已覆盖需求：`can_deliver_on_time=true`、最早可用日为业务日期，**不进入制造倒排**。
+- `fulfillment_mode=production_plan` 表示现货不足：`customer_earliest_available_date` / `customer_late_days` 用于客户交期沟通；`max_delay_days` 仅表示内部倒排风险，不能直接表述为客户延期天数。
+- 报告同时说明数据范围、替代策略与所用计算口径。
 
-## analysis_result（摘要字段）
-
-来自 `backward_plan`：
-
-- `product_code` / `forecast_id` / `demand_end` / `demand_qty`
-- `warehouse_filter`（必须回显）
-- `can_deliver_on_time` / `max_delay_days`
-- `delay_a` / `delay_b`
-- `supply_status_summary`
-- `gaps`
-- `snapshot_meta.input_digest`
-- 不得出现 S2 的 `total_sellable_qty` 作为齐套结论
-
-监控建议若提出：目标只能是一个产品 + 一张需求预测；采购申请决策须人工确认；不创建 ERP PR/PO。
+监控建议如提出，目标只能是一种产品加一张预测；采购申请决策须人工确认，不创建 ERP PR/PO。

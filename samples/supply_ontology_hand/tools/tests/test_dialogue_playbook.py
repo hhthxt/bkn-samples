@@ -19,6 +19,7 @@ def test_dialogue_collects_context_before_running_the_story():
     first = playbook.start()
     assert first["state"] == "collecting_context"
     assert "product" in first["missing_fields"]
+    assert "business_date" not in first["missing_fields"]
 
     response = playbook.handle({"type": "provide_context", "product": "U00-000080"})
     assert response["state"] == "collecting_context"
@@ -47,6 +48,7 @@ def test_dialogue_reveals_story_steps_and_waits_for_human_action_confirmation():
             "forecast_id": "0000023181",
             "demand_end": "2026-05-31",
             "demand_qty": 3000,
+            "business_date": "2026-08-25",
             "substitute_enabled": False,
         }
     )
@@ -70,6 +72,7 @@ def test_dialogue_never_executes_action_without_approval_token():
             "forecast_id": "0000023181",
             "demand_end": "2026-05-31",
             "demand_qty": 3000,
+            "business_date": "2026-08-25",
             "substitute_enabled": False,
         }
     )
@@ -90,6 +93,7 @@ def test_dialogue_executes_only_the_approved_pending_action():
             "forecast_id": "0000023181",
             "demand_end": "2026-05-31",
             "demand_qty": 3000,
+            "business_date": "2026-08-25",
             "substitute_enabled": False,
         }
     )

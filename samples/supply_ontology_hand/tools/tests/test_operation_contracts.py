@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import json
-from pathlib import Path
-
 import pytest
 
 from context.operation_contracts import (
@@ -13,12 +10,10 @@ from context.operation_contracts import (
     required_datasets,
 )
 
-PACK = Path(__file__).resolve().parents[2]
-CONTRACT_JSON = PACK / "docs" / "payloads" / "resolved-context-contracts.json"
-
 EXPECTED = {
     "bom_list": frozenset({"bom"}),
     "bom_shared_list": frozenset({"bom"}),
+    "material_where_used": frozenset({"bom"}),
     "layered_inventory": frozenset({"bom", "inventory"}),
     "substitute_status": frozenset({"bom", "inventory"}),
     "theoretical_build": frozenset({"bom", "inventory"}),
@@ -45,9 +40,9 @@ EXPECTED = {
 }
 
 
-def test_all_thirteen_operations_are_covered():
-    assert len(EXPECTED) == 13
-    assert len(OPERATION_CONTRACTS) == 13
+def test_all_fourteen_operations_are_covered():
+    assert len(EXPECTED) == 14
+    assert len(OPERATION_CONTRACTS) == 14
     assert set(OPERATION_CONTRACTS) == set(EXPECTED)
     for operation, datasets in EXPECTED.items():
         assert required_datasets(operation) == datasets
@@ -83,29 +78,3 @@ def test_missing_datasets_are_listed_exactly():
     present = {"bom"}
     missing = sorted(EXPECTED["kitting_net_demand"] - present)
     assert missing == ["inventory", "purchase_order"]
-
-
-def test_json_contract_matches_python_definition():
-    payload = json.loads(CONTRACT_JSON.read_text(encoding="utf-8"))
-    json_ops = {
-        name: frozenset(spec["required_rows"])
-        for name, spec in payload["operations"].items()
-    }
-    assert len(json_ops) == 13
-    assert json_ops == EXPECTED
-    assert set(payload["allowed_datasets"]) == ALLOWED_DATASETS
-
-
-def test_contracts_do_not_describe_context_loader_calls():
-    payload = CONTRACT_JSON.read_text(encoding="utf-8")
-    forbidden = (
-        "query_object_instance",
-        "run_sql",
-        "query_metric",
-        "bkn_start_interaction",
-        "SELECT ",
-        "mcp",
-    )
-    lowered = payload.lower()
-    for token in forbidden:
-        assert token.lower() not in lowered

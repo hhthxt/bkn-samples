@@ -20,12 +20,15 @@ def theoretical_build(
     *,
     warehouse_scope: str | list[str] | None = "production_available",
     substitute_enabled: bool | None = False,
+    report_grain: str = "summary",
 ) -> dict:
     product = (product or "").strip()
     if not product:
         raise CannotCompute("缺少产品编码")
     if substitute_enabled is None:
         raise CannotCompute("未确认是否启用替代料，不能算理论可产")
+    if report_grain not in {"summary", "full"}:
+        raise CannotCompute(f"report_grain 只能是 summary 或 full：{report_grain}")
     leaves = explode_leaf_usage(
         snap, product, include_substitute=bool(substitute_enabled)
     )
@@ -72,17 +75,21 @@ def theoretical_build(
                 "source": source,
             }
     theoretical = 0 if qty is None else int(qty)
-    return {
+    result = {
         "product_code": product,
         "theoretical_build_qty": theoretical,
         "bottleneck": bottleneck,
-        "constraints": constraints,
+        "report_grain": report_grain,
+        "constraint_count": len(constraints),
         "warehouse_scope": warehouse_scope if not isinstance(warehouse_scope, list) else "custom",
         "warehouse_filter": warehouses,
         "substitute_enabled": bool(substitute_enabled),
         "include_finished_goods": False,
         "include_in_transit": False,
     }
+    if report_grain == "full":
+        result["constraints"] = constraints
+    return result
 
 
 def total_sellable(
@@ -129,12 +136,14 @@ def max_build_without_po(
     *,
     warehouse_scope: str | list[str] | None = "production_available",
     substitute_enabled: bool | None = False,
+    report_grain: str = "summary",
 ) -> dict:
     out = theoretical_build(
         snap,
         product,
         warehouse_scope=warehouse_scope,
         substitute_enabled=substitute_enabled,
+        report_grain=report_grain,
     )
     out = dict(out)
     out["scene"] = "inventory_build"

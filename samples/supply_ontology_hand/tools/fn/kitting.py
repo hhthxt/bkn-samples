@@ -13,6 +13,7 @@ def kitting_net_demand(
     *,
     warehouse_scope: str | list[str] | None = "production_available",
     substitute_enabled: bool | None = False,
+    report_grain: str = "summary",
 ) -> dict:
     product = (product or "").strip()
     if not product:
@@ -27,6 +28,8 @@ def kitting_net_demand(
         raise CannotCompute("数量 X 无效") from exc
     if demand_qty < 0:
         raise CannotCompute("数量 X 不能为负")
+    if report_grain not in {"summary", "full"}:
+        raise CannotCompute(f"report_grain 只能是 summary 或 full：{report_grain}")
 
     leaves = explode_leaf_usage(
         snap, product, include_substitute=bool(substitute_enabled)
@@ -64,19 +67,28 @@ def kitting_net_demand(
             "available_qty": avail,
             "in_transit_qty": transit,
             "net_requirement": net,
+            # This is the replenishment quantity justified by this demand
+            # snapshot only.  MOQ, safety stock and other policies require
+            # separate business input and must not be silently added.
+            "recommended_replenishment_qty": net,
             "source": source,
         }
         lines.append(rec)
         if net > 0:
             gaps.append(rec)
-    return {
+    result = {
         "product_code": product,
         "demand_qty": demand_qty,
         "kitting_ok": len(gaps) == 0,
-        "lines": lines,
+        "report_grain": report_grain,
+        "line_count": len(lines),
+        "gap_count": len(gaps),
         "gaps": gaps,
         "warehouse_scope": warehouse_scope if not isinstance(warehouse_scope, list) else "custom",
         "warehouse_filter": warehouses,
         "substitute_enabled": bool(substitute_enabled),
         "include_in_transit": True,
     }
+    if report_grain == "full":
+        result["lines"] = lines
+    return result

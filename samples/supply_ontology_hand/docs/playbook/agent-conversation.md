@@ -91,17 +91,16 @@ Agent 传入事件，而不是让模型直接拼接 Action SQL：
 
 ## 编排型 Skill 调用
 
-当 Agent 命中 S1/S2/S3 时，Skill 返回的是编排契约，不是一个需要独立 shell 执行的脚本。Agent 应保留当前 Interaction 的两个 ID，完成一次 Context Loader 取证后，将 `resolved_context` 原样交给对应 Toolbox 函数，再按 Skill 生成报告。
+当 Agent 命中 S1/S2/S3 时，Skill 返回的是业务场景说明，不是一个需要独立 shell 执行的脚本。Agent 先通过 MCP 取得事实；涉及业务计算时，从已发布工具中选择相符的具名函数，并只传函数 schema 要求的业务参数。函数自行读取所需知识网络对象，再按 Skill 生成报告。
 
 ```text
 Skill contract
-→ Context Loader（一次）
-→ resolved_context + bkn_context
-→ Toolbox function
+→ Context Loader（事实查询）
+→ Native Toolbox function（业务参数）
 → Agent report
 ```
 
-函数 Toolbox 已支持调用；Agent 应通过 OpenBKN Toolbox Tool 接口提交 `resolved_context`，不得用离线 CLI 结果替代线上证据。
+函数 Toolbox 已支持调用；Agent 应通过 OpenBKN MCP 的 `execute_published_tool` 调用具名函数，不得用离线 CLI 结果替代线上证据。
 
 - 缺少产品、预测单、数量、截止日或替代策略时先追问，不猜测；
 - 不把 S1 的风险直接改写成客户承诺；
