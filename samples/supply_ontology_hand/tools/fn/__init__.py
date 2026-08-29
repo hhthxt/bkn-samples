@@ -1,7 +1,7 @@
 """CSV-gold function library for supply_ontology_hand (口径清单 §2)."""
 
-from .backward_plan import backward_plan
-from .bom import bom_list, bom_shared_list
+from .backward_plan import DEFAULT_BUSINESS_DATE, backward_plan
+from .bom import bom_list, bom_shared_list, material_where_used
 from .capacity import max_build_without_po, theoretical_build, total_sellable
 from .contention import shared_contention
 from .errors import CannotCompute
@@ -16,6 +16,7 @@ from .warehouse import resolve_warehouse_scope
 
 __all__ = [
     "CannotCompute",
+    "DEFAULT_BUSINESS_DATE",
     "backward_plan",
     "bom_list",
     "bom_shared_list",
@@ -23,6 +24,7 @@ __all__ = [
     "layered_inventory",
     "leadtime_days",
     "load_csv_snapshot",
+    "material_where_used",
     "max_build_without_po",
     "open_forecast_count",
     "resolve_warehouse_scope",

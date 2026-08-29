@@ -24,6 +24,7 @@ ALLOWED_DATASETS = frozenset(
 OPERATION_CONTRACTS: Mapping[str, frozenset[str]] = {
     "bom_list": frozenset({"bom"}),
     "bom_shared_list": frozenset({"bom"}),
+    "material_where_used": frozenset({"bom"}),
     "layered_inventory": frozenset({"bom", "inventory"}),
     "substitute_status": frozenset({"bom", "inventory"}),
     "theoretical_build": frozenset({"bom", "inventory"}),

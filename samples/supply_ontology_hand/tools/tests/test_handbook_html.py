@@ -18,10 +18,8 @@ def test_executive_handbook_has_business_story_and_verification_evidence():
         'id="capability-map"',
         'id="validation"',
         'id="release-boundary"',
-        "benchmark-report-2026-08-15.md",
-        "poc-013-validation-report-2026-08-15.md",
-        "238 项通过",
         "openbkn-hand-import-guide_cn.md",
+        "agent-operation-guide.md",
         "agent-scenario-kn-capability-design_cn.md",
         "OpenBKN",
     )

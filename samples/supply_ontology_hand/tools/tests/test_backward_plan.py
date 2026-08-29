@@ -181,7 +181,7 @@ def run_plan(snapshot=None, **overrides):
         "warehouse_scope": "production_available",
         "substitute_enabled": False,
         "report_grain": "full_tree",
-        "today": TODAY,
+        "business_date": TODAY.isoformat(),
     }
     arguments.update(overrides)
     return backward_plan(snapshot or build_snapshot(rows()), **arguments)
@@ -207,7 +207,6 @@ def assert_node_contract(item: dict) -> None:
     ("field", "value"),
     [
         ("product", ""),
-        ("forecast_id", ""),
         ("demand_end", ""),
         ("demand_end", "2026-02-30"),
         ("demand_qty", 0),
@@ -218,12 +217,63 @@ def assert_node_contract(item: dict) -> None:
 )
 def test_rejects_invalid_required_input(field, value):
     with pytest.raises((CannotCompute, ValueError)):
-        run_plan(**{field: value})
+        run_plan(forecast_id=None, **{field: value})
+
+
+def test_business_date_defaults_to_sample_baseline_instead_of_system_today():
+    result = backward_plan(
+        build_snapshot(rows()),
+        PRODUCT,
+        forecast_id=FORECAST_ID,
+        demand_end=DEMAND_END,
+        demand_qty=10,
+        warehouse_scope="production_available",
+        substitute_enabled=False,
+        report_grain="summary",
+    )
+    assert result["business_date"] == "2026-08-25"
+
+
+def test_business_date_is_parsed_and_echoed():
+    result = backward_plan(
+        build_snapshot(rows()),
+        PRODUCT,
+        forecast_id=FORECAST_ID,
+        demand_end=DEMAND_END,
+        demand_qty=10,
+        warehouse_scope="production_available",
+        substitute_enabled=False,
+        report_grain="summary",
+        business_date="2026-08-25",
+    )
+    assert result["business_date"] == "2026-08-25"
 
 
 def test_rejects_missing_forecast():
     with pytest.raises(CannotCompute):
         run_plan(forecast_id="FC-MISSING")
+
+
+def test_allows_new_demand_without_a_forecast_id():
+    result = run_plan(forecast_id=None)
+
+    assert result["forecast_id"] is None
+
+
+def test_forecast_mode_derives_product_quantity_and_due_date_from_forecast():
+    result = backward_plan(
+        build_snapshot(rows()),
+        forecast_id=FORECAST_ID,
+        substitute_enabled=False,
+        report_grain="summary",
+    )
+
+    assert result["forecast_id"] == FORECAST_ID
+    assert result["product_code"] == PRODUCT
+    assert result["demand_qty"] == 10
+    assert result["demand_end"] == DEMAND_END
+    assert result["product_code"] == PRODUCT
+    assert result["demand_qty"] == 10
 
 
 @pytest.mark.parametrize(
@@ -553,6 +603,42 @@ def test_zero_delay_means_product_can_deliver_on_time():
     result = run_plan(build_snapshot(synthetic))
     assert result["max_delay_days"] == 0
     assert result["can_deliver_on_time"] is True
+
+
+def test_finished_goods_coverage_bypasses_manufacturing_plan_for_customer_delivery():
+    synthetic = rows(
+        inventories=[inventory(PRODUCT, 10, warehouse="苏州成品仓")],
+    )
+
+    result = run_plan(build_snapshot(synthetic), demand_qty=10)
+
+    assert result["can_deliver_on_time"] is True
+    assert result["fulfillment_mode"] == "finished_goods"
+    assert result["finished_goods_qty"] == 10
+    assert result["remaining_finished_goods_qty"] == 0
+    assert result["customer_earliest_available_date"] == TODAY.isoformat()
+    assert result["customer_late_days"] == 0
+    assert result["production_plan_required"] is False
+    assert result["node_count_total"] == 0
+
+
+def test_customer_date_fields_use_business_date_and_critical_shortage_lead_time():
+    synthetic = rows(
+        forecasts=[forecast(end="2026-08-17")],
+        materials=[
+            material(PRODUCT, attr="自制", production_lt=1),
+            material("RM-001", attr="外购", purchase_lt=5),
+        ],
+        purchase_requests=[pr("RM-001")],
+        mrps=[mrp("RM-001")],
+    )
+
+    result = run_plan(build_snapshot(synthetic), demand_end="2026-08-17")
+
+    assert result["fulfillment_mode"] == "production_plan"
+    assert result["customer_earliest_available_date"] == "2026-08-19"
+    assert result["customer_late_days"] == 2
+    assert result["production_plan_required"] is True
 
 
 def test_skips_cycle_and_emits_warning():

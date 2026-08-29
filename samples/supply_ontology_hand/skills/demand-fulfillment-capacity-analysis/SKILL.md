@@ -7,9 +7,9 @@ description: >
 
 # 需求承接 · 产品可售能力（S2）
 
-> 只编排指标/函数并出报告，不另发明可售公式。口径：体验包 `docs/能力口径清单.md` §2。  
-> 三个数分开：**理论可产 ≠ 合计可售 ≠ 齐套净需求**。本 Skill 只回答合计可售。
-> 函数工具箱：由本环境管理员配置；不得复制其他环境的 Toolbox ID。
+这是一个**业务场景导航 Skill**。只问一个确定数值时可直接调用函数；当用户还需要解释可售能力含义、库存组成或与交期承诺的区别时使用本 Skill。
+
+> 三个数必须分开：**理论可产 ≠ 合计可售 ≠ 齐套净需求**。本 Skill 只回答合计可售，结果不是交期承诺。
 
 ## Skill Card
 
@@ -18,70 +18,58 @@ description: >
 | `bkn_scope` | `supply_ontology_hand` |
 | `trigger` | 现在最多能卖多少、可售能力、理论可产+成品库存 |
 | `required_metrics` | 库存可用量（成品仓 `finished_goods` + 生产仓 `production_available`） |
-| `required_functions` | **BOM 清单**；**替代料状态**；**理论可产**；**合计可售** |
-| `required_toolbox` | 优先调用 `BOM清单`、`替代料状态`、`理论可产`、`合计可售` |
-| `open_parameters` | `product_query`、`substitute_enabled`、`warehouse_scope?` |
+| `calculation` | **合计可售**（`total_sellable`，返回成品库存、理论可产和合计可售） |
+| `优先指标` | 库存可用量（用于解释成品仓或生产仓事实） |
+| `优先函数` | **合计可售**；必要时配合 **理论可产**、**子料分层库存** |
+| `open_parameters` | `product_query`、`substitute_enabled`、`production_scope?`、`finished_goods_scope?` |
 
 不要调用：净需求/齐套、供应状态 10 档、共用料争用 / S3。在途 PO 可作对照，**不得**加入合计可售。
 
-## 数据交接（强制）
+## Agent 执行步骤
 
-Agent 直接调用**官方 Context Loader**。不要让函数服务取数。本场景最少查询 `bom`、`inventory`（`total_sellable` / `theoretical_build` / `substitute_status`）。
+1. 解析唯一产品；名称存在歧义时先澄清编码或型号。
+2. 确认替代料策略和仓范围；未确认替代策略时不输出确定数量。
+3. 调用 **合计可售**，直接使用函数返回的成品可用、理论可产和总可售结果。
+4. 需要解释瓶颈或库存分布时，再调用 **理论可产** 或 **子料分层库存**。
+5. 明确说明：合计可售是当前静态能力，不等于某个日期的履约承诺；日期承诺转 S1。
 
-1. 先 `bkn_start_interaction`
-2. 按合同查询所需数据集，**只查询一次**，保留每份 `bkn_receipt`
-3. 内联 `resolved_context` 调用函数 Tool；**函数服务不查询**
-4. 结束时 `bkn_finish_interaction`
+## 业务边界
 
-- **禁止伪造** receipt
-- **禁止 CSV** 作为运行时输入
-- 合同见 `docs/第三方Agent数据交接说明.md`
-
-## 口径（禁止改写）
-
-- `理论可产 = MIN(FLOOR(生产可用 / 单耗))`，不加成品、不加在途；替代组内 **MAX**；缺省展开到叶子主料
-- `合计可售 = 成品仓可用 + 理论可产`
+- `total_sellable` 同时返回成品仓可用、理论可产和合计可售，Skill 不在本地重算
+- 理论可产不含成品、不加在途；合计可售包含成品仓可用，但仍不加在途
+- “要 X 套齐不齐”属于齐套净需求；“某日能否交付”属于 S1，不能用可售结果替代
 - 未给出 `substitute_enabled` → 先问再算；未确认返回不能算
 
-## 函数调用
+## 计算调用
 
-平台执行时优先调用 Toolbox Tool，不在 Skill 内重写公式。以下 CLI 只用于离线验收：
-
-```bash
-cd tools
-python3 fn_cli.py bom-list --product U00-000151 --depth 1
-python3 fn_cli.py substitute --product 382-000005
-python3 fn_cli.py theoretical --product 382-000005 --substitute no
-python3 fn_cli.py sellable --product 382-000005 --substitute no
-```
-
-CSV 快照：`382-000005` 成品仓约 **534**，无替代时理论可产 **0**，合计可售 **534**；`U00-000151` 成品仓约 **3800**。
+用户输入先解析为唯一产品编码。业务公式由已发布函数执行，函数自行读取 BKN 数据；Agent 不读取 Skill 源码、不重建运行时、不在本地重算函数结果。
 
 ## 输入
 
 - `knowledge_network_id`：默认 `supply_ontology_hand`
-- `product_query`：必填
+- `product_query`：必填；允许产品编码或名称，名称命中多个编码时必须追问；解析后以 `product` 传给函数
 - `substitute_enabled`：未给出则询问「是否启用替代料核算？（是/否）」
-- 仓范围：成品部分固定 `finished_goods`（3 仓），理论可产用 `production_available`（7 仓）；须回显，不得写死昆山仓
+- `finished_goods_scope`：默认 `finished_goods`；`production_scope`：默认 `production_available`
+- 必须回显函数实际返回的两套仓范围；不得凭 Skill 文本伪造仓名单
 
 ## 编排
 
-1. `resolve_context` — 官方 Context Loader **只查询一次**：产品、BOM、成品仓可用、生产仓可用、替代组；保留 `bkn_receipt` 并内联 `resolved_context`  
-2. `analyze` — 调用理论可产 + 合计可售；只读已内联快照；**函数服务不查询**  
-3. `render_report` — Markdown；禁止再查远端；**声明这不是交期承诺**  
-4. `bkn_finish_interaction`
+1. `resolve_input` — 解析唯一产品，确认替代料及仓范围
+2. `select_capability` — 简单数量直调函数；需要解释业务边界时使用本 Skill
+3. `analyze` — 调用合计可售，必要时补充理论可产或分层库存
+4. `render_report` — 输出 Markdown 并声明不是交期承诺
 
 ## 完成门槛
 
-1. 产品已解析且 BOM 非空（或明确无 BOM 并终止）  
-2. `substitute_enabled` 已确认  
-3. 成品仓名单与生产仓名单均回显  
-4. 出参含 `fg_qty` / `theoretical_build_qty` / `total_sellable_qty`  
-5. 报告阶段远程查询次数为 0  
+1. 产品已解析为唯一编码；BOM 非空，或函数明确返回无法计算
+2. `substitute_enabled` 已确认
+3. 成品仓名单与生产仓名单按函数结果回显
+4. 出参含 `fg_qty` / `theoretical_build_qty` / `total_sellable_qty`
+5. 报告阶段不再拉数或重算
 
 ## 输出
 
-1. `analysis_result`：见 `references/io-contract.md`  
+1. `analysis_result`：见 `references/io-contract.md`
 2. 完整 Markdown：见 `references/report-spec.md`
 
 ## 参考

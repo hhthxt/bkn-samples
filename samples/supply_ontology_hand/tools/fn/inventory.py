@@ -46,7 +46,7 @@ def in_transit_qty(snap: Snapshot, material_code: str) -> float:
     total = 0.0
     for row in snap.po_by_material.get(code, []):
         status = (row.get("rowclosestatus_title") or "").strip()
-        if status in ("已关闭", "Closed"):
+        if status == "已关闭":
             continue
         qty = _f(row.get("qty"), 0.0)
         act = _f(row.get("actqty"), 0.0)
@@ -59,7 +59,7 @@ def pr_open_qty(snap: Snapshot, material_code: str) -> float:
     total = 0.0
     for row in snap.pr_by_material.get(code, []):
         status = (row.get("rowclosestatus_title") or "").strip()
-        if status in ("已关闭", "Closed"):
+        if status == "已关闭":
             continue
         qty = _f(row.get("qty"), 0.0)
         joined = _f(row.get("joinqty"), 0.0)
@@ -71,7 +71,7 @@ def has_mrp(snap: Snapshot, material_code: str) -> bool:
     code = (material_code or "").strip()
     for row in snap.mrp_by_material.get(code, []):
         status = (row.get("closestatus_title") or "").strip()
-        if status in ("已关闭", "Closed"):
+        if status == "已关闭":
             continue
         return True
     return False
@@ -82,7 +82,7 @@ def po_open_rows(snap: Snapshot, material_code: str) -> list[dict]:
     return [
         row
         for row in snap.po_by_material.get(code, [])
-        if (row.get("rowclosestatus_title") or "").strip() not in ("已关闭", "Closed")
+        if (row.get("rowclosestatus_title") or "").strip() != "已关闭"
     ]
 
 
@@ -91,7 +91,7 @@ def pr_open_rows(snap: Snapshot, material_code: str) -> list[dict]:
     return [
         row
         for row in snap.pr_by_material.get(code, [])
-        if (row.get("rowclosestatus_title") or "").strip() not in ("已关闭", "Closed")
+        if (row.get("rowclosestatus_title") or "").strip() != "已关闭"
     ]
 
 
@@ -107,7 +107,12 @@ def layered_inventory(
     if not product:
         raise CannotCompute("缺少产品编码")
     listing = bom_list(
-        snap, product, depth=depth, include_substitute=include_substitute
+        snap,
+        product,
+        depth=depth,
+        include_substitute=include_substitute,
+        report_grain="full",
+        page_size=500,
     )
     warehouses = resolve_warehouse_scope(warehouse_scope)
     lines = []

@@ -8,4 +8,4 @@
   substitute_enabled: false
   assertions:
     - path: steps.0.result.max_delay_days
-      expected: 166
+      expected: 176

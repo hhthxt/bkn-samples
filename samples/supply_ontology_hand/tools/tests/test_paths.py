@@ -15,8 +15,8 @@ def test_pack_layout_exists():
     assert (TOOLS / "power_layer.py").is_file()
     assert (TOOLS / "fn" / "__init__.py").is_file()
     assert (TOOLS / "fn_cli.py").is_file()
-    assert (TOOLS / "fn_service.py").is_file()
-    assert (TOOLS / "export_fn_openapi.py").is_file()
+    assert (TOOLS / "native_function_bundle.py").is_file()
+    assert (TOOLS / "register_native_function_toolbox.py").is_file()
     skills = PACK / "skills"
     assert (skills / "production-schedule-backward-planning" / "SKILL.md").is_file()
     assert (skills / "demand-fulfillment-capacity-analysis" / "SKILL.md").is_file()
@@ -27,7 +27,7 @@ def test_pack_layout_exists():
     assert (payloads / "metrics-create.json").is_file()
     assert (payloads / "metrics-query-examples.json").is_file()
     assert (payloads / "logic-properties.json").is_file()
-    assert (payloads / "functions-openapi.json").is_file()
+    assert not (payloads / "functions-openapi.json").exists()
 
 
 def test_sample_has_twelve_csv():

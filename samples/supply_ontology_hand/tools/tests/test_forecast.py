@@ -52,15 +52,29 @@ def test_open_forecast_count_excludes_closed_rows():
         "operation": "!=",
         "value": CLOSED,
     }
-    assert "f-closed-a" not in result["open_forecast_ids"]
-    assert result["open_forecast_ids"] == ["f-open-a", "f-open-b", "f-blank"]
+    assert result["report_grain"] == "summary"
+    assert "open_forecast_ids" not in result
+
+    full = open_forecast_count(SAMPLE_ROWS, report_grain="full")
+    assert full["report_grain"] == "full"
+    assert "f-closed-a" not in full["open_forecast_ids"]
+    assert full["open_forecast_ids"] == ["f-open-a", "f-open-b", "f-blank"]
 
 
 def test_open_forecast_count_filters_optional_product_code():
     result = open_forecast_count(SAMPLE_ROWS, product_code="382-000005")
     assert result["open_count"] == 1
     assert result["product_code"] == "382-000005"
-    assert result["open_forecast_ids"] == ["f-open-a"]
+    assert "open_forecast_ids" not in result
+
+
+def test_open_forecast_count_rejects_unknown_report_grain():
+    try:
+        open_forecast_count(SAMPLE_ROWS, report_grain="detail")
+    except ValueError as exc:
+        assert "report_grain" in str(exc)
+    else:
+        raise AssertionError("未知 report_grain 应被拒绝")
 
 
 def test_open_forecast_count_matches_independent_csv_count():
@@ -83,6 +97,7 @@ def test_openapi_has_no_include_closed_parameter():
     assert set(schema.get("properties", {})) <= {
         "resolved_context",
         "product_code",
+        "report_grain",
     }
     assert operation["operationId"] == "open_forecast_count"
     assert operation["summary"] == "未关闭预测单数"

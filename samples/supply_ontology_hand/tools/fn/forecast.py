@@ -12,7 +12,10 @@ def open_forecast_count(
     forecast_rows: Iterable[Mapping[str, Any]] | None,
     *,
     product_code: str | None = None,
+    report_grain: str = "summary",
 ) -> dict[str, Any]:
+    if report_grain not in {"summary", "full"}:
+        raise ValueError(f"report_grain 只能是 summary 或 full：{report_grain}")
     rows = [dict(row) for row in (forecast_rows or [])]
     product = (product_code or "").strip() or None
     open_ids: list[str] = []
@@ -25,15 +28,18 @@ def open_forecast_count(
             excluded_closed += 1
             continue
         open_ids.append(str(row.get("id") or row.get("forecast_id") or "").strip())
-    return {
+    result = {
         "open_count": len(open_ids),
         "excluded_closed_count": excluded_closed,
         "input_row_count": len(rows),
         "product_code": product,
+        "report_grain": report_grain,
         "exclusion": {
             "field": "closestatus_title",
             "operation": "!=",
             "value": CLOSED_STATUS,
         },
-        "open_forecast_ids": open_ids,
     }
+    if report_grain == "full":
+        result["open_forecast_ids"] = open_ids
+    return result

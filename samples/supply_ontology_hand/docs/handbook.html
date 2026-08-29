@@ -52,7 +52,7 @@
     <div class="eyebrow">OPENBKN · BUSINESS CASE REPORT</div>
     <h1>供应链智能决策 Sample</h1>
     <p class="lead">把分散的订单、预测、库存、BOM、生产与采购事实，组织为可理解、可验证、可协作的决策网络，让业务团队更快回答“能不能按时交付、风险在哪里、下一步怎么办”。</p>
-    <div class="hero-meta"><span>面向业务负责人 / CIO</span><span>第三方可部署体验 Sample</span><span>截至 2026-08-15 的验证证据</span></div>
+    <div class="hero-meta"><span>面向业务负责人 / CIO</span><span>第三方可部署体验 Sample</span><span>发布前可复核验证</span></div>
   </div></header>
   <nav><div class="wrap"><a href="#executive-summary">管理摘要</a><a href="#business-story">业务故事</a><a href="#scenarios">决策场景</a><a href="#data-foundation">数据基础</a><a href="#knowledge-network">知识网络</a><a href="#capability-map">能力闭环</a><a href="#validation">验证结论</a><a href="#release-boundary">放行边界</a></div></nav>
   <main class="wrap">
@@ -92,9 +92,9 @@
     </section>
     <section id="validation">
       <p class="kicker">Verification evidence</p><h2>验证结论：能力已分层留痕，不混淆“已验证”与“待放行”</h2>
-      <div class="evidence"><strong>本地基准验证：</strong>业务指标、函数、场景与治理四类检查均达到 <strong>1.00</strong>；14 项独立断言通过，第三方 Playbook 盲测 6/6 通过。已归档的发布 Benchmark 记录为 <strong>238 项通过</strong>；本报告页面另增加独立验收，后续结果会随版本继续更新。</div>
-      <table><thead><tr><th>验证层</th><th>已验证结果</th><th>经营含义</th></tr></thead><tbody><tr><td>本地 Benchmark</td><td><span class="pill">通过</span> 指标、函数、场景、治理均 1.00</td><td>示例自身的规则、口径和交付故事可重复验证</td></tr><tr><td>第三方 Playbook 盲测</td><td><span class="pill">通过</span> 6/6</td><td>非开发者可按业务问题和步骤复现核心判断</td></tr><tr><td>POC 基础能力实测</td><td><span class="pill">通过</span> 数据、对象/关系、Skill 召回、函数运行时冒烟</td><td>新环境的导入与基础服务路径可用</td></tr><tr><td>真实业务写入</td><td>未作为发布结论</td><td>继续坚持先演练、人工确认、再执行的治理原则</td></tr></tbody></table>
-      <p class="muted">说明：本地 Benchmark 与 POC 实测是两组独立证据。POC 当前验证了基础问答、Skill 召回及函数运行时路径，不将其表述为完整自主 Agent 对话或真实生产写入验收。</p>
+      <div class="evidence"><strong>发布前验证：</strong>样例的指标、函数、场景和治理边界均由仓库内自动回归验证；对外环境仍须按导入手册完成数据绑定和 MCP 冒烟，不把本地验证表述为客户生产验收。</div>
+      <table><thead><tr><th>验证层</th><th>验证目标</th><th>经营含义</th></tr></thead><tbody><tr><td>本地回归</td><td><span class="pill">可复核</span> 指标、函数、场景与安全边界</td><td>示例规则、口径和交付故事可以随版本重复验证</td></tr><tr><td>第三方环境导入</td><td>按导入手册执行</td><td>确认客户数据库、Catalog、知识网络和权限已经就绪</td></tr><tr><td>MCP 冒烟</td><td>调用标准交期与 BOM 清单</td><td>确认 Agent 可发现并调用原生函数</td></tr><tr><td>真实业务写入</td><td>未作为发布结论</td><td>坚持先演练、人工确认、再执行的治理原则</td></tr></tbody></table>
+      <p class="muted">说明：第三方环境的数据质量、权限、性能和真实业务写入，均需要由部署者在自己的环境完成验收。</p>
     </section>
     <section id="release-boundary">
       <p class="kicker">Release boundary</p><h2>可交付的体验范围，与下一步演进方向</h2>
@@ -103,7 +103,7 @@
     </section>
     <section id="references">
       <p class="kicker">Read more</p><h2>配套材料与验证凭证</h2>
-      <ul><li><a href="./verification/benchmark-report-2026-08-15.md">本地 Benchmark 与第三方 Playbook 盲测报告</a></li><li><a href="./verification/poc-013-validation-report-2026-08-15.md">POC 0.1.3 基础能力实测报告</a></li><li><a href="./openbkn-hand-import-guide_cn.md">第三方导入与部署操作说明</a></li><li><a href="./agent-scenario-kn-capability-design_cn.md">Agent 场景与知识网络能力说明</a></li><li><a href="../README.md">Sample 使用入口与完整资料索引</a></li></ul>
+      <ul><li><a href="./openbkn-hand-import-guide_cn.md">第三方导入与部署操作说明</a></li><li><a href="./agent-operation-guide.md">Agent 操作手册与发布前冒烟</a></li><li><a href="./agent-scenario-kn-capability-design_cn.md">Agent 场景与知识网络能力说明</a></li><li><a href="../README.md">Sample 使用入口与完整资料索引</a></li></ul>
     </section>
   </main>
   <footer class="wrap">OpenBKN 供应链智能决策 Sample · 本报告基于仓库内可复核的 Sample、测试与 POC 验证记录编制。</footer>

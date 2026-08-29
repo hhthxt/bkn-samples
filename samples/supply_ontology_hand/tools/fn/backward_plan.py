@@ -24,6 +24,7 @@ from .supply_status import supply_status
 from .warehouse import resolve_warehouse_scope
 
 MAX_NODES = 5000
+DEFAULT_BUSINESS_DATE = "2026-08-25"
 REPORT_GRAINS = ("summary", "full_tree")
 PURCHASED_ATTRS = ("外购", "委外")
 SUPPLY_STATUSES = (
@@ -70,23 +71,38 @@ def _po_deliver_dates(rows: list[dict]) -> list[date]:
 
 def _validated_request(
     snap: Snapshot,
-    product: str,
-    forecast_id: str,
-    demand_end: str,
+    product: str | None,
+    forecast_id: str | None,
+    demand_end: str | None,
     demand_qty,
     substitute_enabled,
     report_grain: str,
-) -> tuple[str, str, date, float]:
+) -> tuple[str, str | None, date, float]:
     code = (product or "").strip()
-    if not code:
-        raise CannotCompute("缺少产品编码")
     plan_id = str(forecast_id or "").strip()
-    if not plan_id:
-        raise CannotCompute("缺少预测单 ID")
     if not isinstance(substitute_enabled, bool):
         raise CannotCompute("替代料策略必须显式传入 True 或 False")
     if report_grain not in REPORT_GRAINS:
         raise CannotCompute(f"report_grain 只能是 {REPORT_GRAINS}：{report_grain}")
+    if plan_id:
+        row = _find_forecast(snap, plan_id)
+        if not row:
+            raise CannotCompute(f"预测单不存在：{plan_id}")
+        forecast_product = str(row.get("material_number") or "").strip()
+        forecast_due = _parse_day(row.get("enddate"), f"预测单 {plan_id} 截止日")
+        forecast_qty = _f(row.get("qty"), 0.0)
+        if code and forecast_product != code:
+            raise CannotCompute(
+                f"预测单 {plan_id} 的产品为 {forecast_product}，与请求 {code} 不一致"
+            )
+        if demand_end and _parse_day(demand_end, "需求截止日") != forecast_due:
+            raise CannotCompute(f"预测单 {plan_id} 截止日与请求 {demand_end} 不一致")
+        if demand_qty is not None and _f(row.get("qty"), 0.0) != float(demand_qty):
+            raise CannotCompute(f"预测单 {plan_id} 需求量与请求 {demand_qty} 不一致")
+        return forecast_product, plan_id, forecast_due, forecast_qty
+
+    if not code:
+        raise CannotCompute("新增需求缺少产品编码")
     due = _parse_day(demand_end, "需求截止日")
     try:
         qty = float(demand_qty)
@@ -94,20 +110,16 @@ def _validated_request(
         raise CannotCompute(f"需求量不是数字：{demand_qty}") from None
     if qty <= 0:
         raise CannotCompute(f"需求量必须为正数：{demand_qty}")
+    return code, plan_id or None, due, qty
 
-    row = snap.forecast_by_id.get(plan_id)
-    if not row:
-        raise CannotCompute(f"预测单不存在：{plan_id}")
-    forecast_product = str(row.get("material_number") or "").strip()
-    if forecast_product != code:
-        raise CannotCompute(
-            f"预测单 {plan_id} 的产品为 {forecast_product}，与请求 {code} 不一致"
-        )
-    if _parse_day(row.get("enddate"), f"预测单 {plan_id} 截止日") != due:
-        raise CannotCompute(f"预测单 {plan_id} 截止日与请求 {demand_end} 不一致")
-    if _f(row.get("qty"), 0.0) != qty:
-        raise CannotCompute(f"预测单 {plan_id} 需求量与请求 {demand_qty} 不一致")
-    return code, plan_id, due, qty
+
+def _find_forecast(snap: Snapshot, requested_id: str) -> dict | None:
+    """Find a forecast while tolerating numeric resource keys losing CSV leading zeroes."""
+    direct = snap.forecast_by_id.get(requested_id)
+    if direct is not None or not requested_id.isdigit():
+        return direct
+    canonical = str(int(requested_id))
+    return snap.forecast_by_id.get(canonical)
 
 
 def _walk(
@@ -244,15 +256,15 @@ def _sorted_delays(bucket: dict[str, dict]) -> list[dict]:
 
 def backward_plan(
     snap: Snapshot,
-    product: str,
+    product: str | None = None,
     *,
-    forecast_id: str,
-    demand_end: str,
-    demand_qty,
+    forecast_id: str | None = None,
+    demand_end: str | None = None,
+    demand_qty=None,
+    business_date: str | None = None,
     warehouse_scope: str | list[str] | None = "production_available",
     substitute_enabled: bool,
     report_grain: str = "summary",
-    today: date | None = None,
 ) -> dict:
     """按一张预测单倒排单个产品的主料齐套计划。
 
@@ -270,8 +282,46 @@ def backward_plan(
     )
     if not product_bom_rows(snap, code):
         raise CannotCompute(f"无 BOM：{code}")
-    today = today or date.today()
+    effective_business_date = (
+        DEFAULT_BUSINESS_DATE if business_date is None else business_date
+    )
+    today = _parse_day(effective_business_date, "业务日期")
     warehouse_filter = resolve_warehouse_scope(warehouse_scope)
+    finished_goods_filter = resolve_warehouse_scope("finished_goods")
+    finished_goods_qty = available_qty(snap, code, "finished_goods")
+
+    # This function is used for a customer delivery commitment as well as a
+    # production-plan diagnosis.  A finished-goods shipment must never be
+    # rejected merely because a hypothetical new manufacturing run is late.
+    if finished_goods_qty >= qty:
+        return {
+            "product_code": code,
+            "forecast_id": plan_id,
+            "demand_qty": qty,
+            "demand_end": due.isoformat(),
+            "business_date": today.isoformat(),
+            "today": today.isoformat(),
+            "warehouse_scope": warehouse_scope if isinstance(warehouse_scope, str) else "custom",
+            "warehouse_filter": warehouse_filter,
+            "finished_goods_filter": finished_goods_filter,
+            "finished_goods_qty": finished_goods_qty,
+            "remaining_finished_goods_qty": finished_goods_qty - qty,
+            "fulfillment_mode": "finished_goods",
+            "production_plan_required": False,
+            "customer_earliest_available_date": today.isoformat(),
+            "customer_late_days": 0,
+            "substitute_enabled": substitute_enabled,
+            "report_grain": report_grain,
+            "can_deliver_on_time": True,
+            "max_delay_days": 0,
+            "delay_a": [],
+            "delay_b": [],
+            "nodes": [],
+            "node_count_total": 0,
+            "gaps": [],
+            "supply_status_summary": {status: 0 for status in SUPPLY_STATUSES},
+            "warnings": ["成品现货已覆盖需求，未启动制造倒排。"],
+        }
 
     warnings: list[str] = []
     if substitute_enabled:
@@ -369,6 +419,18 @@ def backward_plan(
         [row["delay_days"] for row in (*delay_a.values(), *delay_b.values())],
         default=0,
     )
+    customer_readiness = []
+    for gap in gaps:
+        material_code = gap["material_code"]
+        open_po_dates = [day for day in _po_deliver_dates(po_open_rows(snap, material_code)) if day >= today]
+        if open_po_dates:
+            customer_readiness.append(min(open_po_dates))
+        else:
+            customer_readiness.append(
+                today + timedelta(days=leadtime_days(snap, material_code))
+            )
+    customer_earliest = max(customer_readiness, default=today)
+    customer_late_days = max(0, (customer_earliest - due).days)
     if report_grain == "full_tree":
         reported = list(nodes)
     else:
@@ -385,9 +447,17 @@ def backward_plan(
         "forecast_id": plan_id,
         "demand_qty": qty,
         "demand_end": due.isoformat(),
+        "business_date": today.isoformat(),
         "today": today.isoformat(),
         "warehouse_scope": warehouse_scope if isinstance(warehouse_scope, str) else "custom",
         "warehouse_filter": warehouse_filter,
+        "finished_goods_filter": finished_goods_filter,
+        "finished_goods_qty": finished_goods_qty,
+        "remaining_finished_goods_qty": max(0.0, finished_goods_qty - qty),
+        "fulfillment_mode": "production_plan",
+        "production_plan_required": True,
+        "customer_earliest_available_date": customer_earliest.isoformat(),
+        "customer_late_days": customer_late_days,
         "substitute_enabled": substitute_enabled,
         "report_grain": report_grain,
         "can_deliver_on_time": max_delay_days == 0,

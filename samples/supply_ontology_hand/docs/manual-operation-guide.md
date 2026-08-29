@@ -59,20 +59,11 @@ python3 power_layer.py all --kn-id supply_ontology_hand
 python3 register_native_function_toolbox.py --apply
 ```
 
-### 函数 Toolbox 与超时处理
+### 原生函数工具箱
 
-函数服务启动后，Toolbox 名称只能使用中文、字母、数字和下划线，不能含连字符、空格或其他标点。创建前先在 UI 或 `openbkn toolbox list` 中确认同名 Toolbox；如果 POC 返回连接超时，先检查 `openbkn auth status` 和 Toolbox 列表，再决定是否重试，避免重复创建。
+Toolbox 名称只能使用中文、字母、数字和下划线，不能含连字符、空格或其他标点。创建前先在 UI 或 `openbkn toolbox list` 中确认同名 Toolbox；如果 POC 返回连接超时，先检查 `openbkn auth status` 和 Toolbox 列表，再决定是否重试，避免重复创建。
 
-默认样例使用 OpenBKN 内建的 `metadata_type=function` 运行时，不需要 `FUNCTION_SERVICE_URL`、Docker、`host.docker.internal` 或独立函数服务器。操作者只需已登录 OpenBKN；脚本会创建或更新 `供应链原生计算函数` Toolbox。外部 OpenAPI/Docker 服务仅用于客户自行扩展，不是体验样例的前置条件。
-
-本 sample 已提供可自托管的函数服务容器。开发机或客户自己的 Docker 主机上执行：
-
-```bash
-docker compose -f docker-compose.function.yaml up -d --build
-curl http://127.0.0.1:8765/health
-```
-
-本机验证通过后，不能把 `http://127.0.0.1:8765` 填入远程 POC Toolbox。应把同一容器部署到客户/伙伴可控制且 OpenBKN 能访问的运行环境，使用该环境返回的 HTTPS 地址作为 `FUNCTION_SERVICE_URL`，只由管理员在 Toolbox 配置时填写一次。业务 Agent 和业务用户不需要知道这个地址；他们调用的是 OpenBKN Execution Factory 的 REST Proxy。参考 [BKN Foundry ToolBox REST proxy](https://openbkn-ai.github.io/bkn-foundry/versions/v0.1.3/execution-factory/toolbox.html)。
+默认样例使用 OpenBKN 内建的 `metadata_type=function` 运行时，不需要函数服务器地址、Docker、`host.docker.internal` 或独立函数服务。操作者只需已登录 OpenBKN；脚本会创建或更新 `供应链原生计算函数` Toolbox，并发布 14 个按业务命名的函数。调用者只传业务参数；函数在受控运行时读取已绑定的知识网络。
 
 ### Action Dataset 建表
 
