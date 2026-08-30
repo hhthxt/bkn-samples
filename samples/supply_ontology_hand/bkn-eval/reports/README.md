@@ -29,6 +29,13 @@
 | `path-b-direct-db-answer.md` | 路径 B：智能体仅通过同一快照的只读数据库作答的原始报告。 |
 | `comparison.md` | 路径 C：依据冻结的 A/B 原始回答与答案集生成的逐题对比报告。 |
 | `comparison.html` | 面向业务读者的 HTML 对比报告；结论必须与 `comparison.md` 一致。 |
+| `2026-08-30-benchmark-summary.png` | HTML 报告首页截图：A/B 总体结果与题型准确率。 |
+| `2026-08-30-benchmark-analysis.png` | HTML 报告续页截图：关键差异、效率对比与 A 路径表现。 |
+
+## 报告截图
+
+- [总体结果与题型准确率](2026-08-30-benchmark-summary.png)
+- [关键差异、效率与 A 路径表现](2026-08-30-benchmark-analysis.png)
 
 ## 发布边界
 
