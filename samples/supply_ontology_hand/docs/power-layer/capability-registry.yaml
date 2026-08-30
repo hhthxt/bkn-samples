@@ -1,5 +1,11 @@
-version: 1
+version: 2
 knowledge_network_id: supply_ontology_hand
+function_runtime:
+  toolbox_name: 供应链原生计算函数
+  public_entry: OpenBKN MCP
+  discovery: [list_published_toolboxes, list_published_tools]
+  invocation: execute_published_tool
+  caller_contract: 仅传目标函数 schema 要求的业务参数；函数在运行时读取已绑定知识网络
 capabilities:
   - {id: product_count, layer: metric, entrypoint: tools/metrics.py, verification: eval/cases/metrics.yaml}
   - {id: material_count, layer: metric, entrypoint: tools/metrics.py, verification: eval/cases/metrics.yaml}
@@ -11,6 +17,7 @@ capabilities:
   - {id: open_forecast_count, layer: metric, entrypoint: tools/metrics.py, verification: eval/cases/metrics.yaml}
   - {id: bom_list, layer: function, entrypoint: tools/fn/bom.py, verification: tools/tests/test_fn_core.py}
   - {id: bom_shared_list, layer: function, entrypoint: tools/fn/bom.py, verification: tools/tests/test_fn_core.py}
+  - {id: material_where_used, layer: function, entrypoint: tools/fn/bom.py, verification: tools/tests/test_fn_core.py}
   - {id: layered_inventory, layer: function, entrypoint: tools/fn/inventory.py, verification: tools/tests/test_fn_core.py}
   - {id: substitute_status, layer: function, entrypoint: tools/fn/substitute.py, verification: tools/tests/test_fn_core.py}
   - {id: theoretical_build, layer: function, entrypoint: tools/fn/capacity.py, verification: tools/tests/test_fn_core.py}
