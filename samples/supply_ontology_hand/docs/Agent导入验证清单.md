@@ -16,11 +16,11 @@ B. 导入知识网络 JSON（步骤 2）→ 确认 id=supply_ontology_hand
 C. 灌入 data/*.csv（步骤 3）→ 行数与下表一致
 D. Catalog 扫描 + 对象绑定（步骤 4～5）→ 11 个 bind:true 可查
 E. smoke_test.py 通过
-F. 动力层：python3 tools/power_layer.py all --kn-id supply_ontology_hand
-   （创建指标 + 挂逻辑属性 + 快照验收）
-G. 注册并发布场景技能（至少 S1）
-H. 跑业务问答测试集（先 S4 规模，再 S1 倒排）
-I. 治理题：监控任务须确认；发起 PO 拒绝自动
+F. 创建指标并挂逻辑属性：python3 tools/power_layer.py all --kn-id supply_ontology_hand
+G. 注册并发布 14 个原生函数：python3 tools/register_native_function_toolbox.py --apply
+H. 用 MCP 完成函数冒烟（本清单 §3）；通过后再注册场景技能（可选增强）
+I. 跑业务问答测试集（先规模与事实，再函数和场景）
+J. 治理题：监控任务须确认；发起 PO 拒绝自动
 ```
 
 改的是 `tools/config.yaml`（库地址、Catalog 名），**不要改** CSV 文件名、`object_table_map.yaml`、`kn_id`。
@@ -32,7 +32,7 @@ I. 治理题：监控任务须确认；发起 PO 拒绝自动
 | # | 检查 | 期望 | 证据 | 通过 |
 |---|------|------|------|------|
 | 1.1 | 知识网络名称 / ID | `供应链本体知识网络-手工版` / `supply_ontology_hand` | `openbkn` 列表或 UI | ☐ |
-| 1.2 | 对象类可列出 | 15 个 OT；业务对象前缀为 `supply_ontology_hand_`，另有 `skills` | `search_schema` / OT 列表 | ☐ |
+| 1.2 | 对象类可列出 | 13 个 OT；业务对象前缀为 `supply_ontology_hand_`，另有 `skills` | `search_schema` / OT 列表 | ☐ |
 | 1.3 | 产品实例 | **30** | 对象查询 count | ☐ |
 | 1.4 | 物料实例 | **3497** | 同上 | ☐ |
 | 1.5 | 供应商 | **230** | 同上 | ☐ |
@@ -83,7 +83,25 @@ python3 smoke_test.py --config config.yaml
 
 ---
 
-## 3. P0：S1 齐套倒排（标杆场景）
+## 3. P0：原生函数发布与 MCP 冒烟
+
+函数是样例对外的统一计算能力。由环境管理员注册，运行时由 Agent 通过 OpenBKN MCP 发现并调用；不要把其他环境生成的 Toolbox 或 Tool ID 写进配置、Skill 或提示词。
+
+```bash
+cd tools
+python3 register_native_function_toolbox.py --apply
+```
+
+| # | 检查 | 期望 | 通过 |
+|---|------|------|------|
+| 3.1 | 工具箱发布 | MCP `list_published_toolboxes` 可按名称发现 `供应链原生计算函数`，状态为 published | ☐ |
+| 3.2 | 工具目录完整 | MCP `list_published_tools` 返回 **14** 个 enabled 的具名函数，含“标准交期”“BOM清单”“物料反查产品”“生产计划齐套倒排” | ☐ |
+| 3.3 | 标准交期冒烟 | 在新的受管 Interaction 中，通过 `execute_published_tool` 调用“标准交期”，只传 `material_code=606-000989`，返回 `leadtime_days=14` | ☐ |
+| 3.4 | BOM 冒烟 | 在另一新的受管 Interaction 中调用“BOM清单”，只传 `product=382-000005`，返回一级主料数 **9** | ☐ |
+| 3.5 | 调用契约 | Agent 未传 Token、服务地址、`resolved_context`、快照或 Toolbox UUID；函数自行读取已绑定知识网络 | ☐ |
+| 3.6 | 运行证据 | 两次 Interaction 均正常结束，函数返回结构化业务结果；失败时保留 Interaction ID 和原始错误，不用 CSV/本地计算伪造线上结果 | ☐ |
+
+## 4. P0：S1 齐套倒排（标杆场景）
 
 固定题：
 
@@ -107,7 +125,7 @@ python3 smoke_test.py --config config.yaml
 
 ---
 
-## 4. P1：可售与覆盖
+## 5. P1：可售与覆盖
 
 | # | 检查 | 期望 | 通过 |
 |---|------|------|------|
@@ -124,7 +142,7 @@ python3 smoke_test.py --config config.yaml
 
 ---
 
-## 5. 治理与失败降级
+## 6. 治理与失败降级
 
 | # | 检查 | 期望 | 通过 |
 |---|------|------|------|
@@ -137,11 +155,13 @@ python3 smoke_test.py --config config.yaml
 
 ---
 
-## 6. 给智能体的最短系统提示（可粘贴）
+## 7. 给智能体的最短系统提示（可粘贴）
 
 ```text
 你正在使用知识网络 supply_ontology_hand（供应链本体知识网络-手工版）。
 数据是体验包脱敏样例：30 个成品，仓库用苏州/乌鲁木齐/哈尔滨，不要用昆山/新疆，不要用另一张网的 431。
+
+先创建受管 Interaction。事实查询使用 Context Loader MCP；复杂业务计算先用 MCP 的 list_published_toolboxes / list_published_tools 按业务名称发现“供应链原生计算函数”，再调用 execute_published_tool。函数只传公开 schema 所需的业务参数，函数自己读取知识网络；不传数据快照、resolved_context、Token、服务地址或其他环境的 ID。简单事实问题不必调用函数或 Skill。
 
 生产齐套默认只加这 7 个仓的可用库存：苏州半成品仓、苏州成品仓、苏州电子原料仓、苏州无人机原料仓、苏州装配原料仓、乌鲁木齐成品仓、哈尔滨成品仓。
 成品发货看：苏州成品仓、乌鲁木齐成品仓、哈尔滨成品仓。
@@ -162,14 +182,15 @@ python3 smoke_test.py --config config.yaml
 
 ---
 
-## 7. 通过标准（冻结体验包）
+## 8. 通过标准（冻结体验包）
 
 **P0 全部勾选** 才可对客户说「这张网可以交给第三方智能体验证」：
 
 - 步骤 1 的 1.1～1.9 + smoke_test
 - 步骤 2 的规模与库存题（2.2～2.9）
-- 步骤 3 的倒排标杆题（3.2～3.6）
+- 步骤 3 的 14 函数发布与两项 MCP 冒烟
+- 步骤 4 的倒排标杆题（4.2～4.6）
 
-**P1**（4.x）建议在演示「需求承接」前完成。
+**P1**（5.x）建议在演示「需求承接」前完成。
 
 未通过时：先查绑定与仓名，再查指标是否创建，最后才查技能正文；不要先改 CSV。
